@@ -699,4 +699,3 @@ Edit the Description of this Panel:<br>
 		echo "</tr>";
 	}
 }
-?>

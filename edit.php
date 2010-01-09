@@ -296,4 +296,3 @@ else if( $user->get_Username() == $panelist && $action == "panelist" )
 	
 	$connection->query($query);
 }
-?>

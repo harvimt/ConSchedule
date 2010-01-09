@@ -1,0 +1,118 @@
+<?php
+// vim: syn=php
+/**
+ * @file conschedule.install
+ * @author Mark Harviston
+ * @version 0.1
+ */
+
+/**
+ * Implementation of hook_install()
+ */
+
+function osbit_install() {
+	//install db
+	drupal_install_schema('conschedule');
+}
+
+/**
+ * Implementation of hook_uninstall()
+ */
+
+function osbit_uninstall() {
+	//remove db
+	drupal_uninstall_schema('osbit');
+}
+
+/**
+* Implementation of hook_schema().
+*/
+
+function osbit_schema() {
+	//database schema
+	$schema['conschedule_events'] = array(
+		'description' => t('Schedule Events'),
+		'fields' => array(
+			'e_eventID' => array(
+				'type' => 'serial',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+				'size' => 'normal',
+				'description' => t('Auto Incrementer'),
+			),
+			'e_roomID' => array(
+				'type' => 'int',
+				'unsigned' => TRUE,
+				'size' => 'normal',
+				'not null' => TRUE,
+				'description' => t('Foreign key to a room'),
+			),
+			'e_dateStart' => array(
+				'type' => 'datetime',
+				'not null' => TRUE,
+				'default' => '0000-00-00 00:00:00',
+			),
+			'e_dateEnd' => array(
+				'type' => 'datetime',
+				'not null' => TRUE,
+				'default' => '0000-00-00 00:00:00',
+			),
+			'e_eventName' => array(
+				'type' => 'tinytext',
+				'not null' => TRUE,
+				'default' => '',
+			),
+			'e_color' => array(
+				'type' => 'tinytext',
+				'not null' => TRUE,
+				'default' => '',
+			),
+			'e_eventDesc' => array(
+				'type' => 'text',
+				'not null' => TRUE,
+				'default' => '',
+			),
+			'e_panelist' => array(
+				'type' => 'tinytext',
+				'not null' => TRUE,
+			),
+		),
+		'primary key' => array('e_eventID'),
+	);
+	
+	$schema['conschedule_userSchedule'] = array(
+		'description' => 'Where a user can store events in his/her personal schedule',
+		'fields' => array(
+			'us_userID' => array(
+				'type' => 'int(11)',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+				'default' => 0,
+			),
+			'us_eventID' => array(
+			   'type' => 'int(11)',
+			   'unsigned' => TRUE,
+			   'not null' => TRUE,
+			   'default' => 0,
+			),
+		);
+	);
+
+	$schema['conschedule_rooms'] = array(
+		'description' => 'Rooms on the conschedule',
+		'fields' => array(
+			'r_roomID' => array(
+			   'type' => 'serial',
+			   'unsigned' => TRUE,
+			   'not null' => TRUE,
+			),
+			'r_roomName' => array(
+			   'type' => 'tinytext',
+			   'not null' => TRUE,
+			),
+		),
+		'primary key' =>  array('r_roomID'),
+	); 
+
+	return $schema;
+}

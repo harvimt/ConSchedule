@@ -65,5 +65,3 @@ else
 		$page->addURL("view.php?event=$eID","No"); 
 		echo "</center>";
 }
-
-?>

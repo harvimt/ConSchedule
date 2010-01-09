@@ -95,4 +95,3 @@ class Event
 		return (($this->endDate->format("U") - $this->startDate->format("U"))/60/60)*2;
 	}
 }
-?>

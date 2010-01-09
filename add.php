@@ -230,4 +230,3 @@ else
 	
 	$page->createEventForm($connection, $room, $date);
 }
-?>

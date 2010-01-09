@@ -87,4 +87,3 @@ else if( $user->get_Username() == $event->getPanelist() && $user->is_User())
 	echo "<br><hr><hr><br>";
 	$page->printPanelistEdit($event, $eventID);
 }
-?>

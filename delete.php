@@ -73,4 +73,3 @@ else
 	$page->addURL("index.php","Return to event schedule.");
 	echo "</center>";
 }
-?>

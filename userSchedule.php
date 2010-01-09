@@ -281,4 +281,3 @@ function isTimeConflict($reqEvent, $schedEvent) {
  		return FALSE;
  	}
 }
-?>

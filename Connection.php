@@ -88,5 +88,3 @@ class Connection {
 		return $this->fetch_row();
 	}
 }
-
-?>

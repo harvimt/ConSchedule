@@ -12,4 +12,3 @@ $database_server = "";
 
 #set the database name
 $database_name = "";
-?>

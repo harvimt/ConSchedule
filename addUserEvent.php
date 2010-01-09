@@ -205,5 +205,3 @@ function getConflictType($reqEvent, $schedEvent) {
 	} 
 	return 2;
 }
-?>
-
