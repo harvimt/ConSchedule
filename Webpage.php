@@ -1,44 +1,47 @@
 <?php
 /*
- *      Webpage.php
- *      
- *      Copyright © 2008 Dylan Enloe <ninina@koneko-hime>
- *		Copyright © 2009, 2010 Drew Fisher <kakudevel@gmail.com>
+ *		Webpage.php
+ *		
+ *		Copyright < 2008 Dylan Enloe <ninina@koneko-hime>
+ *		Copyright < 2009, 2010 Drew Fisher <kakudevel@gmail.com>
  *		ALL RIGHTS RESERVED
- *      
- *      This program is free software; you can redistribute it and/or modify
- *      it under the terms of the GNU General Public License as published by
- *      the Free Software Foundation; either version 2 of the License, or
- *      (at your option) any later version.
- *      
- *      This program is distributed in the hope that it will be useful,
- *      but WITHOUT ANY WARRANTY; without even the implied warranty of
- *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *      GNU General Public License for more details.
- *      
- *      You should have received a copy of the GNU General Public License
- *      along with this program; if not, write to the Free Software
- *      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- *      MA 02110-1301, USA.
+ *		
+ *		This program is free software; you can redistribute it and/or modify
+ *		it under the terms of the GNU General Public License as published by
+ *		the Free Software Foundation; either version 2 of the License, or
+ *		(at your option) any later version.
+ *		
+ *		This program is distributed in the hope that it will be useful,
+ *		but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *		GNU General Public License for more details.
+ *		
+ *		You should have received a copy of the GNU General Public License
+ *		along with this program; if not, write to the Free Software
+ *		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ *		MA 02110-1301, USA.
  */
 
 class Webpage {
 
-	private $user;
+	//private $user;
 	
-	function __construct($title, $user)
+	function __construct($title)
 	{
-		$this->user = $user;
+		//$this->user = $user;
+		$consched_path = base_path().drupal_get_path('module','conschedule');
 		echo "
 <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"
 \"http://www.w3.org/TR/html4/loose.dtd\">
 <head>
 	<title>Mewcon: $title</title>
 	<meta http-equiv=\"content-type\" content=\"text/html;charset=utf-8\">
-	<link href=\"MEWschedule.css\" rel=\"stylesheet\" type=\"text/css\">
-	<script type=\"text/javascript\" language=\"javascript\" src=\"MEWschedule.js\"></script>
+	<link href=\"$consched_path/MEWschedule.css\" rel=\"stylesheet\" type=\"text/css\">
+	<script type=\"text/javascript\" language=\"javascript\" src=\"$consched_path/MEWschedule.js\"></script>
 </head>
-<body>
+<body>";
+
+/* TODO DELETE this, we don't need it if we're using  drupal for menus
 <div id='headerMenu'>";
 echo "<ul>";
 echo "<li>";
@@ -48,13 +51,17 @@ echo "</li><li>";
 echo "</li><li>";
 	$this->addURL("userSchedule.php","User Schedule");
 echo "</li>";
+*/
+
 // admin menu stuff
+/*
 if( $user->is_Admin() )
 {
 	echo "<li>";
 	$this->addURL("add.php","Add Event");
 	echo "</li>";
 }
+*/
 echo "</ul>";
 echo "</div><p></p>";
 	}
@@ -79,7 +86,6 @@ echo "</div><p></p>";
 	// conOpens and conCloses are epxected to be of type Date
 	public function printDaySchedule($schedule, $roomNames, $conOpens, $conCloses) 
 	{
-	
 		// only print 24 hours from beginning time
 		$dayCheck = clone($conOpens);
 		$dayCheck->modify("+1 days");
@@ -157,7 +163,9 @@ echo "</div><p></p>";
 					}
 					else
 					{
-						if( $this->user->is_Admin() )
+						/*
+						   TODO
+					   if( $this->user->is_Admin() )
 						{
 							echo "<td>";
 							$s = "room=$roomName&date=". $tableTime->format("YmdHis");
@@ -165,6 +173,7 @@ echo "</div><p></p>";
 							echo "</td>";
 						}
 						else
+						*/
 						{
 							echo "<td>&nbsp;</td>";
 						}
@@ -196,12 +205,13 @@ echo "</div><p></p>";
 		Room:<br>
 		<select name="room">
 ENDHTML;
-		$query ="SELECT r_roomID, r_roomName FROM rooms ORDER BY (r_roomID) ASC;";
-		$connection->query($query);
-		while($row = $connection->fetch_assoc())
+		$query ="SELECT r_roomid, r_roomname FROM {conschedule_rooms} ORDER BY r_roomid ASC";
+		$result=db_query($query);
+
+		while($row = db_fetch_object($result))
 		{
-			$roomID = $row['r_roomID'];
-			$roomname = $row['r_roomName'];
+			$roomID = $row->r_roomid;
+			$roomname = $row->r_roomname;
 			
 			// check if $roomName was specified and select if equal
 			if( isset($room) && $room == $roomname)
@@ -303,14 +313,13 @@ ENDHTML;
 		Room:<br>
 		<select name="room">
 ENDHTML;
-		$query ="SELECT r_roomID, r_roomName FROM rooms ORDER BY (r_roomID) ASC;";
+		$query ="SELECT r_roomid, r_roomname FROM {conschedule_rooms} ORDER BY r_roomID ASC";
+		$result=db_query($query);
 		
-		$connection->query($query);
-		
-		while($row = $connection->fetch_assoc())
+		while($row = db_fetch_object($result))
 		{
-			$roomID = $row['r_roomID'];
-			$roomname = $row['r_roomName'];
+			$roomID = $row->r_roomid;
+			$roomname = $row->r_roomname;
 			if($room == $roomname)
 			{
 				echo "<option value='$roomID' selected='yes'>$roomname</option>";
@@ -520,31 +529,29 @@ Edit the Description of this Panel:<br>
 			return NULL;
 		}
 		
-		$q = NULL;
 		
 		if( $createEventObj == FALSE)
 		{
 			// we only care the the event exists, so keep the query simple.
-			$q = "SELECT e_eventID FROM events WHERE e_eventID = $eID;";
+			$result=db_query("SELECT e_eventid FROM {conschedule_events} WHERE e_eventid = %i",$eID);
 		}
 		else
 		{
 			// get the actual event from the db
-			$q = "
+			$result=db_query("
 			SELECT
-				e_eventID, r_roomName, e_dateStart, e_dateEnd, 
-				e_eventName, e_color, e_eventDesc, e_panelist
-			FROM
-				events, rooms
+				e_eventid, r_roomname, e_datestart, e_dateend, 
+				e_eventname, e_color, e_eventdesc, e_panelist
+			from
+				{conschedule_events}, {conschedule_rooms}
 			WHERE 
-				e_eventID = ". $eID ."
+				e_eventid = %i ". $eID ."
 				AND
-				r_roomID = e_roomID
-			;";
+				r_roomid = e_roomid
+			;",$eID);
 		}
-		$connection->query($q);
 
-		if( $connection->result_size() != 1 )
+		if( mysql_num_rows($result) != 1 )
 		{
 			$this->printError("EventID doesn't exist in the database.");
 			echo "<center>";
@@ -559,12 +566,11 @@ Edit the Description of this Panel:<br>
 		}
 		else
 		{
-			$row = $connection->fetch_assoc();
+			$row = db_fetch_object($result);
 
 			return new Event(
-				$row['e_eventID'], $row['e_eventName'], $row['r_roomName'], 
-				$row['e_dateStart'],$row['e_dateEnd'], $row['e_eventDesc'], 
-				$row['e_panelist'], $row['e_color']
+				$row->e_eventID, $row->e_eventName, $row->r_roomName, $row->e_dateStart,
+				$row->e_dateEnd, $row->e_eventDesc, $row->e_panelist, $row->e_color
 			);
 		}
 	}

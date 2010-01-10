@@ -1,4 +1,5 @@
-name = ConSchedule
-description = A tabular layout for a events with time on the vertical and place on the horizontal, for showing different events at a convention
-package = conschedule
+; $Id$
+name = "ConSchedule"
+description = "A tabular layout for a events showing different events at a convention"
+package = Other
 core = 6.x

@@ -1,4 +1,5 @@
 <?php
+// $Id$
 // vim: syn=php
 /**
  * @file conschedule.install
@@ -10,8 +11,7 @@
  * Implementation of hook_install()
  */
 
-function osbit_install() {
-	//install db
+function conschedule_install() {
 	drupal_install_schema('conschedule');
 }
 
@@ -19,99 +19,111 @@ function osbit_install() {
  * Implementation of hook_uninstall()
  */
 
-function osbit_uninstall() {
-	//remove db
-	drupal_uninstall_schema('osbit');
+function conschedule_uninstall() {
+	drupal_uninstall_schema('conschedule');
 }
 
 /**
 * Implementation of hook_schema().
 */
 
-function osbit_schema() {
+function conschedule_schema() {
 	//database schema
 	$schema['conschedule_events'] = array(
 		'description' => t('Schedule Events'),
 		'fields' => array(
-			'e_eventID' => array(
+			'e_eventid' => array(
 				'type' => 'serial',
 				'unsigned' => TRUE,
 				'not null' => TRUE,
 				'size' => 'normal',
 				'description' => t('Auto Incrementer'),
 			),
-			'e_roomID' => array(
+			'e_roomid' => array(
 				'type' => 'int',
 				'unsigned' => TRUE,
 				'size' => 'normal',
 				'not null' => TRUE,
 				'description' => t('Foreign key to a room'),
 			),
-			'e_dateStart' => array(
+			'e_datestart' => array(
 				'type' => 'datetime',
 				'not null' => TRUE,
 				'default' => '0000-00-00 00:00:00',
 			),
-			'e_dateEnd' => array(
+			'e_dateend' => array(
 				'type' => 'datetime',
 				'not null' => TRUE,
 				'default' => '0000-00-00 00:00:00',
 			),
-			'e_eventName' => array(
-				'type' => 'tinytext',
+			'e_eventname' => array(
+				'type' => 'varchar',
+				'length' => 40,
 				'not null' => TRUE,
 				'default' => '',
 			),
 			'e_color' => array(
-				'type' => 'tinytext',
+				'type' => 'varchar',
+				'length' => 10,
 				'not null' => TRUE,
 				'default' => '',
 			),
-			'e_eventDesc' => array(
-				'type' => 'text',
+			'e_eventdesc' => array(
+				'type' => 'varchar',
+				'length' => 255,
 				'not null' => TRUE,
 				'default' => '',
 			),
 			'e_panelist' => array(
-				'type' => 'tinytext',
+				'type' => 'varchar',
+				'length' => 40,
 				'not null' => TRUE,
 			),
 		),
-		'primary key' => array('e_eventID'),
+		'primary key' => array('e_eventid'),
 	);
 	
-	$schema['conschedule_userSchedule'] = array(
+	$schema['conschedule_userschedule'] = array(
 		'description' => 'Where a user can store events in his/her personal schedule',
 		'fields' => array(
-			'us_userID' => array(
-				'type' => 'int(11)',
+			'us_uschedid' => array(
+				'type' => 'serial',
+				'unsigned' => true,
+				'not null' => true,
+			),
+			'us_userid' => array(
+				'type' => 'int',
+				'size' => 'normal',
 				'unsigned' => TRUE,
 				'not null' => TRUE,
 				'default' => 0,
 			),
-			'us_eventID' => array(
-			   'type' => 'int(11)',
+			'us_eventid' => array(
+			   'type' => 'int',
+			   'size' => 'normal',
 			   'unsigned' => TRUE,
 			   'not null' => TRUE,
 			   'default' => 0,
 			),
-		);
+		),
+		'primary key' => array('us_uschedid'),
 	);
 
 	$schema['conschedule_rooms'] = array(
 		'description' => 'Rooms on the conschedule',
 		'fields' => array(
-			'r_roomID' => array(
+			'r_roomid' => array(
 			   'type' => 'serial',
 			   'unsigned' => TRUE,
 			   'not null' => TRUE,
 			),
-			'r_roomName' => array(
-			   'type' => 'tinytext',
+			'r_roomname' => array(
+			   'type' => 'varchar',
+			   'length' => 40,
 			   'not null' => TRUE,
 			),
 		),
-		'primary key' =>  array('r_roomID'),
+		'primary key' =>  array('r_roomid'),
 	); 
 
 	return $schema;

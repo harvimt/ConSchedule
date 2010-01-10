@@ -30,9 +30,6 @@ $C = new Connection();
 $user = new User();
 $page = new Webpage("Con Schedule Test", $user);
 
-$defaultStartTime = "08:00:00";
-$defaultEndTime = "03:00:00";
-
 /* NOTE: there is no code in Webpage::printDaySchedule
  * that visually separates days, so if you put a "day's"
  * start and end time as something greater than 24 hours,

@@ -101,7 +101,6 @@ table#conflicts thead
 .timeColumn 
 {
 	font-weight: bold;
-	//font-size: small;
 	width: 4%;
 	text-align: center;
 	height: 3em;
@@ -115,6 +114,7 @@ table#conflicts thead
 .event_container {
 	position: relative;
 }
+
 .foundEvent .startTime
 {
 	padding:  2px 0em;
