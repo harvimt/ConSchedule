@@ -388,6 +388,5 @@ class ConSchedule {
 			$tableTime->modify("+30 minutes");
 		}
 		echo '</table>';
-		echo '</div>';
 	}
 }
