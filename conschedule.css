@@ -1,5 +1,5 @@
 /*
- *      MEWSchedule.css
+ *      conschedule.css
  *      
  *      Copyright © 2009, 2010 Drew Fisher <kakudevel@gmail.com>
  *      Copyright © 2010 Mark Harviston <infinull@gmail.com>
@@ -21,13 +21,6 @@
  *      MA 02110-1301, USA.
  */
  
-/*body
-{
-	background-color: #FFF;
-	margin: 0px;
-}
-*/
-
 #conschedule_body{
 	margin-left: 8px;
 	margin-right: 8px;

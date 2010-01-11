@@ -1,4 +1,6 @@
 /*
+ * 		conschedule.js
+ *
  *		Copyright © 2010 Mark Harviston <infinull@gmail.com>
  *		ALL RIGHTS RESERVED
  *      
