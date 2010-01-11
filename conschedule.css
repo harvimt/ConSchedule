@@ -2,6 +2,7 @@
  *      MEWSchedule.css
  *      
  *      Copyright © 2009, 2010 Drew Fisher <kakudevel@gmail.com>
+ *      Copyright © 2010 Mark Harviston <infinull@gmail.com>
  *		ALL RIGHTS RESERVED
  *      
  *      This program is free software; you can redistribute it and/or modify
@@ -20,9 +21,14 @@
  *      MA 02110-1301, USA.
  */
  
-body
+/*body
 {
 	background-color: #FFF;
+	margin: 0px;
+}
+*/
+
+#conschedule_body{
 	margin-left: 8px;
 	margin-right: 8px;
 }
@@ -39,10 +45,9 @@ table thead
 	text-align: center;
 }
 
-table td, table th
-{
-	border: 1px solid black;
-	padding: .25em;
+table td, table th {
+	border: 1px solid black; 
+	border-width: 1px; padding: .25em;
 	top: 0px;
 	left: 8px;
 	background-color: #fff;
@@ -80,25 +85,25 @@ table.timeForm thead
 	text-align: left;
 }
 
-table.timeForm td
+#conschedule_body table.timeForm td
 {
 	border: none;
 	padding: .25em 0em;
 	padding-right: 2em;
 }
 
-table.addPage thead
+#conschedule_body table.addPage thead
 {
 	background: #CCF;
 }
 
-table#conflicts thead
+#conschedule_body table#conflicts thead
 {
 	background:#FCC;
 }
 
 
-.timeColumn 
+#conschedule_body .timeColumn 
 {
 	font-weight: bold;
 	width: 4%;

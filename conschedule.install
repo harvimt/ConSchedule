@@ -58,7 +58,7 @@ function conschedule_schema() {
 			),
 			'e_eventname' => array(
 				'type' => 'varchar',
-				'length' => 40,
+				'length' => 255,
 				'not null' => TRUE,
 				'default' => '',
 			),

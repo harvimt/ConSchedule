@@ -5,6 +5,7 @@
 function conschedule_init(){
 	global $conschedule_global;
 
+	//SETTINGS
 	date_default_timezone_set('America/Los_Angeles');
 
 	$conschedule_global = new stdClass();
@@ -18,6 +19,7 @@ function conschedule_init(){
 	$conschedule_global->conTimes[2]['end'] = "2010-01-02 02:00:00";
 	$conschedule_global->conTimes[3]['start'] = "2010-01-02 09:00:00";
 	$conschedule_global->conTimes[3]['end'] = "2010-01-03 00:00:00";
+	$conschedule_global->conTitle = 'MewCon Schedule Test';
 }
 
 function con_dump($o){
@@ -30,9 +32,10 @@ function con_dump($o){
 function conschedule_menu(){
 	$items['schedule'] = array(
 		'title' => 'Schedule',
-		'type' => MENU_CALLBACK,
+		'type' => MENU_NORMAL_ITEM,
 		'page callback' => 'conschedule_home',
 		'access arguments' => array('access content'),
+		'menu_name' => 'primary-links', //show in menu
 	);
 	$items['schedule/kiosk'] = array(
 		'title' => 'Schedule Kiosk',
@@ -40,19 +43,79 @@ function conschedule_menu(){
 		'page callback' => 'conschedule_kiosk',
 		'access arguments' => array('access content'),
 	);
-	/*
-	$items['schedule/user/'] = array(
-		'title' => 'User Schedule',
-		'type' => MENU_CALLBACK,
+
+	//Event (add, edit, delete, and even view)
+	$items['schedule/event/%'] = array(
+		'title' => 'Event',
+		'page arguments' => array(2),
+		'page callback' => 'conschedule_event',
+		'access arguments' => array('access content'),
 	);
-	schedule/event/%/view
-	schedule/event/%/add
-	schedule/event/%/edit
-	schedule/event/%/delete
-	schedule/userschedule/add/%
-	schedule/userschedule/remove/%
-	schedule/userschedule/view/%
-	*/
+	$items['schedule/event/%/view'] = array(
+		'title' => 'View',
+		'type' => MENU_DEFAULT_LOCAL_TASK,
+		'page arguments' => array(2,3),
+		'page callback' => 'conschedule_event',
+		'access arguments' => array('access content'),
+	);
+	$items['schedule/event/%/edit'] = array(
+		'title' => 'Edit',
+		'type' => MENU_LOCAL_TASK,
+		'page callback' => 'conschedule_event',
+		'page arguments' => array(2,3),
+		'access arguments' => array('administer conschedule'),
+	);
+	$items['schedule/event/%/add'] = array(
+		'title' => 'Add',
+		'type' => MENU_LOCAL_TASK,
+		'page callback' => 'conschedule_event',
+		'page arguments' => array(2,3),
+		'access arguments' => array('administer conschedule'),
+	);
+	$items['schedule/event/%/delete'] = array(
+		'title' => 'Delete',
+		'type' => MENU_LOCAL_TASK,
+		'page callback' => 'conschedule_event',
+		'page arguments' => array(2,3),
+		'access arguments' => array('administer conschedule'),
+	);
+
+	//Room (add, edit, delete, and list)
+	$items['schedule/room/%'] = array(
+		'title' => 'Room',
+		'page callback' => 'conschedule_room',
+		'page arguments' => array(2),
+		'access arguments' => array('administer conschedule'),
+	);
+	$items['schedule/room/%/list'] = array(
+		'title' => 'List',
+		'type' => MENU_DEFAULT_LOCAL_TASK,
+		'page arguments' => array(2,3),
+		'page callback' => 'conschedule_room',
+		'access arguments' => array('administer conschedule'),
+	);
+	$items['schedule/room/%/edit'] = array(
+		'title' => 'Edit',
+		'type' => MENU_LOCAL_TASK,
+		'page callback' => 'conschedule_room',
+		'page arguments' => array(2,3),
+		'access arguments' => array('administer conschedule'),
+	);
+	$items['schedule/room/%/add'] = array(
+		'title' => 'Add',
+		'type' => MENU_LOCAL_TASK,
+		'page callback' => 'conschedule_room',
+		'page arguments' => array(2,3),
+		'access arguments' => array('administer conschedule'),
+	);
+	$items['schedule/room/%/delete'] = array(
+		'title' => 'Delete',
+		'type' => MENU_LOCAL_TASK,
+		'page callback' => 'conschedule_room',
+		'page arguments' => array(2,3),
+		'access arguments' => array('administer conschedule'),
+	);
+
 	return $items;
 }
 
@@ -62,203 +125,54 @@ function conschedule_perm(){
 	return array('access content', 'administer conschedule');
 }
 
+//Menu Item Callbacks
+// :=> /schedule
 function conschedule_home(){
-	ob_start();
-	conschedule_kiosk();
-	return ob_get_flush();
+	$conschedule_path = drupal_get_path('module','conschedule');
+	include_once($conschedule_path . '/conschedule.inc');
+	include_once($conschedule_path . '/Event.php');
+	
+	$cs = new ConSchedule();
+	return $cs->printSchedule(TRUE);
 }
 
+//:=> /schedule/kiosk
 function conschedule_kiosk(){
-	global $conschedule_global;
-	global $user;
 	$conschedule_path = drupal_get_path('module','conschedule');
-	//include_once($conschedule_path . '/User.php');
+	include_once($conschedule_path . '/conschedule.inc');
 	include_once($conschedule_path . '/Event.php');
-	include_once($conschedule_path . '/Webpage.php');
-	$page = new Webpage();
-	$conDayCount = count($conschedule_global->conTimes);
 
-	// used if _GET['startTime'] or _GET['endTime'] are specified,
-	// filled with conTimes span otherwise.
+	$cs = new ConSchedule();
+	echo $cs->printSchedule(FALSE);
+}
 
-	$startDate = NULL;
-	$endDate = NULL;
-	$date = NULL;
+//:=> /schedule/event/{$event_id}/{$op}
+function conschedule_event($event_id,$op='view'){
+	$conschedule_path = drupal_get_path('module','conschedule');
+	include_once($conschedule_path . '/event.inc');
 
-	// check for index.php?date=YYYYMMDD[&startTime=HHMM][&endTime=HHMM]
-	// or index.php?conday=#[&startTime=HHMM][&endTime=HHMM]
-
-	if( isset($_GET['conday']) && strlen($_GET['conday']) <= 2) //I doubt we'll ever have more than 99 days of con...
+	if($op == 'view')
 	{
-		$conday = $_GET['conday'];
-		if( isset($conschedule_global->conTimes[$conday]) )
-		{
-			$ex = explode(" ", $conshedule_global->conTimes[$conday]['start'] );
-			$date = $ex[0];
-		}
-		else
-		{
-			$conday = NULL;
-		} 
-	}
-
-	if( isset($_GET['date']) && strlen($_GET['date']) == 8 && ! isset($conday) )
-	{
-		//$date = $C->validate_string($_GET['date']);
-		$date = $_GET['date'];
-	} 
-
-	//if either ?conday or ?date were passed, check for ?startTime and ?endTime
-	if( isset($conday) || isset($_GET['date']) )
-	{ 
-		if( isset($_GET['startTime']) && strlen($_GET['startTime']) == 4 )
-		{
-			$startTime = $_GET['startTime'];
-			$conschedule_global->defaultStartTime = $startTime . "00";
-		}
-
-		if( isset($_GET['endTime']) && strlen($_GET['endTime']) == 4 )
-		{
-			$endTime = $_GET['endTime'];
-			$conschedule_global->defaultEndTime = $endTime . "00";
-		}
-
-		$startDate = date_create($date ." ". $conschedule_global->defaultStartTime);
-		$endDate = date_create($date ." ". $conschedule_global->defaultEndTime);
-
-		// if the end time is before or equal to the start time, assume 
-		// they meant the end time was on the following day.
-
-		$diff = $endDate->format("U") - $startDate->format("U");
-
-		if( $diff <= 0 )
-		{
-			$endDate->modify("+1 day");
-		}
-	}
-
-	/* special check when ?conday is passed, possibly with a ?startTime, in case
-	 * the $conTimes[$conday]['end'] is before the $defaultEndTime.
-	 * we don't want to print out more times than the official con runs.
-	 *
-	 * (NOTE that if a user specifies an ?endTime that goes beyond the conday time,
-	 * we assume the user knows what they're doing and wants to see till, say, 4am
-	 * even if the con only goes till 2am.) 
-	 */
-	if( isset($conday) && ! isset($_GET['endTime']) )
-	{
-		$conEndTime = date_create( $conschedule_global->conTimes[$conday]['end'] );
-
-		$diff = $conEndTime->format("U") - $endDate->format("U");
-
-		if( $diff < 0)
-		{
-			$endDate = date_create( $conschedule_global->conTimes[$conday]['end'] );
-		}
-	}
-
-	//fill in the start and end times with conTimes if not specified via url params
-	if( ! isset($startDate) && ! isset($endDate) )
-	{
-		$startDate = date_create( $conschedule_global->conTimes[0]['start'] );
-		$endDate = date_create( $conschedule_global->conTimes[$conDayCount-1]['end'] ); 
-	}
-
-	$schedule = NULL;
-
-	// events query
-	$result = db_query("
-	SELECT 
-		e_eventid, e_eventname, r_roomname, e_datestart, 
-		e_dateend, e_eventname, e_eventdesc, e_color, e_panelist
-	FROM 
-		{conschedule_events}, {conschedule_rooms}
-	WHERE 
-		e_roomid = r_roomid AND
-		e_datestart BETWEEN '%s' AND '%s'
-	ORDER BY
-		r_roomID ASC
-	;", $startDate->format("Y-m-d H:i:s"), $endDate->format("Y-m-d H:i:s"));
-
-	$eventCount = mysql_num_rows($result); //TODO: really shouldn't do this, but uhm, it's the easiest solution, 
-	//and the "preffered solution is to perform antoher query, which doesn't seem correct
-
-	if( $eventCount < 1 ) 
-	{
-		if( isset($_GET['date']) )
-		{
-			drupal_set_message("No events scheduled for ". $startDate->format("F d, Y"),'error');
-				echo "<center>";
-				$page->addURL("index.php","Return to non-filtered event schedule.");
-				echo "</center>";
-				return;
-		}
-		else
-		{
-			drupal_set_message("No events scheduled.",'error');
-		}
-
-		echo "<center>";
-
-			if( ! in_array('administer conschedule', array_values($user->roles)) )
-			{
-				drupal_set_message("Please check back later. We'll be posting events soon =^.^=",'status');
-			}
-			else
-			{
-				/*TODO
-				echo "Oi, you: ";
-				$page->addURL("add.php","add an event");
-				echo "!"; 
-				*/
-			}
-		echo "</center>";
-		return;
-	}
-
-	// create the events and roomNames arrays
-	$roomNames = array();
-	$events = array();
-	while( $row = db_fetch_object($result)) {
-		$events[] = new Event( 
-			$row->e_eventid, $row->e_eventname, $row->r_roomname, $row->e_datestart, $row->e_dateend,
-			$row->e_eventdesc, $row->e_panelist, $row->e_color 
-			);
-
-		if( ! in_array($row->r_roomname, $roomNames))
-		{
-			$roomNames[] = $row->r_roomname;
-		}
-	}
-
-	// set up the schedule var
-	foreach( $roomNames as $roomName )
-	{
-		foreach( $events as $event )
-		{
-			if( $event->getRoomName() == $roomName )
-			{
-				$fmt = $event->getStartDate()->format("Y-m-d H:i:s");
-				$schedule[$fmt][$roomName] = $event;
-			}
-		}
-	}
-
-	// print the schedule(s)
-	echo "<center>";
-	if( isset($conday) || isset($_GET['date']) )
-	{
-		$page->printDaySchedule($schedule, $roomNames, $startDate, $endDate);
+		return conschedule_event_view($event_id);
 	}
 	else
 	{
-		for( $i = 0; $i < $conDayCount; $i++ )
-		{
-			$dayStarts = date_create( $conschedule_global->conTimes[$i]['start'] );
-			$dayEnds = date_create( $conschedule_global->conTimes[$i]['end'] );
-
-			$page->printDaySchedule($schedule, $roomNames, $dayStarts, $dayEnds); 
-		}
+		return drupal_get_form('conschedule_event_form',$event_id,$op);
 	}
-	echo "</center>"; 
+}
+
+//:=> /schedule/event/{$event_id}/{$op}
+function conschedule_room($room_id=NULL,$op='list'){
+	$conschedule_path = drupal_get_path('module','conschedule');
+	include_once($conschedule_path . '/room.inc');
+	
+	if($op == 'list')
+	{
+		return conschedule_room_list();
+	}
+	else
+	{
+		assert(!is_null($room_id));
+		return drupal_get_form('conschedule_room_form',$room_id,$op);
+	}
 }
