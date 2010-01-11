@@ -1,6 +1,19 @@
 <?php
 // vim: syn=php
-
+function conschedule_room($room_id=NULL,$op='list'){
+	$conschedule_path = drupal_get_path('module','conschedule');
+	include_once($conschedule_path . '/room.inc');
+	
+	if($op == 'list')
+	{
+		return conschedule_room_list();
+	}
+	else
+	{
+		assert(!is_null($room_id));
+		return drupal_get_form('conschedule_room_form',$room_id,$op);
+	}
+}
 //implements hook_form
 function conschedule_room_form($form_state, $room_id, $op)
 {
@@ -16,7 +29,7 @@ function conschedule_room_form($form_state, $room_id, $op)
 	//branch for different operations
 	if($op == 'delete')
 	{
-		$result = db_query('SELECT r_roomname FROM {conschedule_rooms} WHERE r_roomid = %d', $event_id);
+		$result = db_query('SELECT r_roomname FROM {conschedule_rooms} WHERE r_roomid = %d', $room_id);
 		$data = db_fetch_object($result);
 		$room_name = $data->r_roomname;
 		return array(

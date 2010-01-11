@@ -390,3 +390,23 @@ class ConSchedule {
 		echo '</table>';
 	}
 }
+
+function conschedule_home(){
+	$conschedule_path = drupal_get_path('module','conschedule');
+	include_once($conschedule_path . '/conschedule.inc');
+	include_once($conschedule_path . '/Event.php');
+	
+	$cs = new ConSchedule();
+	return $cs->printSchedule(TRUE);
+}
+
+//:=> /schedule/kiosk
+function conschedule_kiosk(){
+	$conschedule_path = drupal_get_path('module','conschedule');
+	include_once($conschedule_path . '/conschedule.inc');
+	include_once($conschedule_path . '/Event.php');
+
+	$cs = new ConSchedule();
+	echo $cs->printSchedule(FALSE);
+}
+

@@ -36,12 +36,14 @@ function conschedule_menu(){
 		'page callback' => 'conschedule_home',
 		'access arguments' => array('access content'),
 		'menu_name' => 'primary-links', //show in menu
+		'file' => 'conschedule.inc',
 	);
 	$items['schedule/kiosk'] = array(
 		'title' => 'Schedule Kiosk',
 		'type' => MENU_CALLBACK,
 		'page callback' => 'conschedule_kiosk',
 		'access arguments' => array('access content'),
+		'file' => 'conschedule.inc',
 	);
 
 	//Event (add, edit, delete, and even view)
@@ -50,6 +52,7 @@ function conschedule_menu(){
 		'page arguments' => array(2),
 		'page callback' => 'conschedule_event',
 		'access arguments' => array('access content'),
+		'file' => 'event.inc',
 	);
 	$items['schedule/event/%/view'] = array(
 		'title' => 'View',
@@ -57,6 +60,7 @@ function conschedule_menu(){
 		'page arguments' => array(2,3),
 		'page callback' => 'conschedule_event',
 		'access arguments' => array('access content'),
+		'file' => 'event.inc',
 	);
 	$items['schedule/event/%/edit'] = array(
 		'title' => 'Edit',
@@ -64,6 +68,7 @@ function conschedule_menu(){
 		'page callback' => 'conschedule_event',
 		'page arguments' => array(2,3),
 		'access arguments' => array('administer conschedule'),
+		'file' => 'event.inc',
 	);
 	$items['schedule/event/%/add'] = array(
 		'title' => 'Add',
@@ -71,6 +76,7 @@ function conschedule_menu(){
 		'page callback' => 'conschedule_event',
 		'page arguments' => array(2,3),
 		'access arguments' => array('administer conschedule'),
+		'file' => 'event.inc',
 	);
 	$items['schedule/event/%/delete'] = array(
 		'title' => 'Delete',
@@ -78,6 +84,7 @@ function conschedule_menu(){
 		'page callback' => 'conschedule_event',
 		'page arguments' => array(2,3),
 		'access arguments' => array('administer conschedule'),
+		'file' => 'event.inc',
 	);
 
 	//Room (add, edit, delete, and list)
@@ -86,6 +93,7 @@ function conschedule_menu(){
 		'page callback' => 'conschedule_room',
 		'page arguments' => array(2),
 		'access arguments' => array('administer conschedule'),
+		'file' => 'room.inc',
 	);
 	$items['schedule/room/%/list'] = array(
 		'title' => 'List',
@@ -93,6 +101,7 @@ function conschedule_menu(){
 		'page arguments' => array(2,3),
 		'page callback' => 'conschedule_room',
 		'access arguments' => array('administer conschedule'),
+		'file' => 'room.inc',
 	);
 	$items['schedule/room/%/edit'] = array(
 		'title' => 'Edit',
@@ -100,6 +109,7 @@ function conschedule_menu(){
 		'page callback' => 'conschedule_room',
 		'page arguments' => array(2,3),
 		'access arguments' => array('administer conschedule'),
+		'file' => 'room.inc',
 	);
 	$items['schedule/room/%/add'] = array(
 		'title' => 'Add',
@@ -107,6 +117,7 @@ function conschedule_menu(){
 		'page callback' => 'conschedule_room',
 		'page arguments' => array(2,3),
 		'access arguments' => array('administer conschedule'),
+		'file' => 'room.inc',
 	);
 	$items['schedule/room/%/delete'] = array(
 		'title' => 'Delete',
@@ -114,65 +125,13 @@ function conschedule_menu(){
 		'page callback' => 'conschedule_room',
 		'page arguments' => array(2,3),
 		'access arguments' => array('administer conschedule'),
+		'file' => 'room.inc',
 	);
 
 	return $items;
 }
 
-
 //implements hook_perm
 function conschedule_perm(){
 	return array('access content', 'administer conschedule');
-}
-
-//Menu Item Callbacks
-// :=> /schedule
-function conschedule_home(){
-	$conschedule_path = drupal_get_path('module','conschedule');
-	include_once($conschedule_path . '/conschedule.inc');
-	include_once($conschedule_path . '/Event.php');
-	
-	$cs = new ConSchedule();
-	return $cs->printSchedule(TRUE);
-}
-
-//:=> /schedule/kiosk
-function conschedule_kiosk(){
-	$conschedule_path = drupal_get_path('module','conschedule');
-	include_once($conschedule_path . '/conschedule.inc');
-	include_once($conschedule_path . '/Event.php');
-
-	$cs = new ConSchedule();
-	echo $cs->printSchedule(FALSE);
-}
-
-//:=> /schedule/event/{$event_id}/{$op}
-function conschedule_event($event_id,$op='view'){
-	$conschedule_path = drupal_get_path('module','conschedule');
-	include_once($conschedule_path . '/event.inc');
-
-	if($op == 'view')
-	{
-		return conschedule_event_view($event_id);
-	}
-	else
-	{
-		return drupal_get_form('conschedule_event_form',$event_id,$op);
-	}
-}
-
-//:=> /schedule/event/{$event_id}/{$op}
-function conschedule_room($room_id=NULL,$op='list'){
-	$conschedule_path = drupal_get_path('module','conschedule');
-	include_once($conschedule_path . '/room.inc');
-	
-	if($op == 'list')
-	{
-		return conschedule_room_list();
-	}
-	else
-	{
-		assert(!is_null($room_id));
-		return drupal_get_form('conschedule_room_form',$room_id,$op);
-	}
 }

@@ -1,6 +1,20 @@
 <?php
 // vim: syn=php
 
+function conschedule_event($event_id,$op='view'){
+	$conschedule_path = drupal_get_path('module','conschedule');
+	include_once($conschedule_path . '/event.inc');
+
+	if($op == 'view')
+	{
+		return conschedule_event_view($event_id);
+	}
+	else
+	{
+		return drupal_get_form('conschedule_event_form',$event_id,$op);
+	}
+}
+
 //implements hook_form
 function conschedule_event_form($form_state, $event_id, $op)
 {
