@@ -21,6 +21,7 @@
  *      MA 02110-1301, USA.
  */
 // vim: syn=php
+
 function conschedule_room($room_id=NULL,$op='list'){
 	$conschedule_path = drupal_get_path('module','conschedule');
 	include_once($conschedule_path . '/room.inc');
@@ -35,6 +36,7 @@ function conschedule_room($room_id=NULL,$op='list'){
 		return drupal_get_form('conschedule_room_form',$room_id,$op);
 	}
 }
+
 //implements hook_form
 function conschedule_room_form($form_state, $room_id, $op)
 {
@@ -141,13 +143,8 @@ function conschedule_room_form_submit($form, &$form_state)
 	}
 	else if($form_state['values']['_op'] == 'edit')
 	{
-		db_query("UPDATE {conschedule_rooms} SET
-				r_roomname = '%s'
-				WHERE r_roomid = %d
-				",
-				$form_state['values']['roomname'], 
-				$form_state['values']['roomid']
-				);
+		db_query("UPDATE {conschedule_rooms} SET r_roomname = '%s' WHERE r_roomid = %d",
+				$form_state['values']['roomname'], $form_state['values']['roomid']);
 		drupal_set_message(t('Room Updated'));
 	}
 	else
@@ -166,8 +163,9 @@ function conschedule_room_list()
 		$rows[]= array(
 			'name' => $row->r_roomname,
 			'edit' => '<a href="'.url('/schedule/room/'.$row->r_roomid.'/edit').'">Edit</a>',
+			'delete' => '<a href="'.url('/schedule/room/'.$row->r_roomid.'/delete').'">Delete</a>',
 		);
 	}
-	$headers = array('Room Name');
-	return theme_table($header, $rows, array('id'=>'conschedule_row_list'));
+	$headers = array('Room Name','','');
+	return theme_table($headers, $rows, array('id'=>'conschedule_row_list'));
 }
