@@ -78,30 +78,37 @@ table.timeForm thead
 	text-align: left;
 }
 
-#conschedule_body table.timeForm td
+
+table.timeForm td
 {
 	border: none;
 	padding: .25em 0em;
 	padding-right: 2em;
 }
 
-#conschedule_body table.addPage thead
+table.addPage thead
 {
 	background: #CCF;
 }
 
-#conschedule_body table#conflicts thead
+table#conflicts thead
 {
 	background:#FCC;
 }
 
 
-#conschedule_body .timeColumn 
+.timeColumn 
 {
 	font-weight: bold;
 	width: 4%;
 	text-align: center;
 	height: 3em;
+}
+
+/* In User Schedule */
+.inusched .event_container
+{
+	border: 1px solid red;
 }
 
 .foundEvent

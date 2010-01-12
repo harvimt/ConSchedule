@@ -22,7 +22,8 @@
  *      MA 02110-1301, USA.
  */
 
-function conschedule_event($event_id,$op='view'){
+function conschedule_event($event_id,$op='view')
+{
 	if($op == 'view')
 	{
 		return conschedule_event_view($event_id);
@@ -55,21 +56,21 @@ function conschedule_event_form($form_state, $event_id, $op)
 		$data = db_fetch_object($result);
 		$event_name = $data->e_eventname;
 		return array(
-				'title' => array(
-					'#value' => "Are you sure you want to delete the event \"$event_name\"?",
-				),
-				'eventid' => array(
-					'#type' => 'hidden',
-					'#value' => $event_id,
-				),
-				'_op' => array(
-					'#type' => 'hidden',
-					'#value' => 'delete',
-				),
-				'submit' => array(
-					'#type' => 'submit',
-					'#value' => 'Yes',
-				),
+			'title' => array(
+				'#value' => "Are you sure you want to delete the event \"$event_name\"?",
+			),
+			'eventid' => array(
+				'#type' => 'hidden',
+				'#value' => $event_id,
+			),
+			'_op' => array(
+				'#type' => 'hidden',
+				'#value' => 'delete',
+			),
+			'submit' => array(
+				'#type' => 'submit',
+				'#value' => 'Yes',
+			),
 		);
 	}
 
@@ -85,11 +86,11 @@ function conschedule_event_form($form_state, $event_id, $op)
 	if($op == 'edit')
 	{
 		$result = db_query('SELECT 
-				e_roomid, e_eventname, e_color,
-				e_datestart, e_dateend, 
-				e_eventdesc, e_panelist
-				FROM {conschedule_events}
-				WHERE e_eventid = %d', $event_id);
+			e_roomid, e_eventname, e_color,
+			e_datestart, e_dateend, 
+			e_eventdesc, e_panelist
+			FROM {conschedule_events}
+			WHERE e_eventid = %d', $event_id);
 		$data = db_fetch_object($result);
 		if($data === FALSE){
 			drupal_set_message('No Event with id, ' . $event_id, 'error');
@@ -187,7 +188,6 @@ function conschedule_event_form($form_state, $event_id, $op)
 
 function conschedule_event_form_validate($form, &$form_state)
 {
-	//con_dump($form_state['values']);
 	if($form_state['values']['_op'] != 'delete'){
 		if($form_state['values']['title'] == '')
 		{
@@ -212,30 +212,31 @@ function conschedule_event_form_submit($form, &$form_state)
 	else if($form_state['values']['_op'] == 'add')
 	{
 		db_query("INSERT INTO {conschedule_events} (
-				e_roomid, e_eventname, e_color,
-				e_datestart, e_dateend, 
-				e_eventdesc, e_panelist
-				) VALUES (%d,'%s','%s','%s','%s','%s','%s')",
-				$form_state['values']['panelRoom'], $form_state['values']['title'], $form_state['values']['color'],
-				$form_state['values']['startTime'], $form_state['values']['endTime'],
-				$form_state['values']['description'], $form_state['values']['panelist']
-				);
+			e_roomid, e_eventname, e_color,
+			e_datestart, e_dateend, 
+			e_eventdesc, e_panelist
+			) VALUES (%d,'%s','%s','%s','%s','%s','%s')",
+			$form_state['values']['panelRoom'], $form_state['values']['title'], $form_state['values']['color'],
+			$form_state['values']['startTime'], $form_state['values']['endTime'],
+			$form_state['values']['description'], $form_state['values']['panelist']
+			);
 
 		drupal_set_message(t('Event Added'));
 	}
 	else if($form_state['values']['_op'] == 'edit')
 	{
 		db_query("UPDATE {conschedule_events} SET
-				e_roomid = %d, e_eventname = '%s', e_color = '%s',
-				e_datestart = '%s', e_dateend = '%s', 
-				e_eventdesc = '%s', e_panelist = '%s'
-				WHERE e_eventid = %d
-				",
-				$form_state['values']['panelRoom'], $form_state['values']['title'], $form_state['values']['color'],
-				$form_state['values']['startTime'], $form_state['values']['endTime'],
-				$form_state['values']['description'], $form_state['values']['panelist'],
-				$form_state['values']['eventid']
-				);
+			e_roomid = %d, e_eventname = '%s', e_color = '%s',
+			e_datestart = '%s', e_dateend = '%s', 
+			e_eventdesc = '%s', e_panelist = '%s'
+			WHERE e_eventid = %d
+			",
+			$form_state['values']['panelRoom'], $form_state['values']['title'], $form_state['values']['color'],
+			$form_state['values']['startTime'], $form_state['values']['endTime'],
+			$form_state['values']['description'], $form_state['values']['panelist'],
+			$form_state['values']['eventid']
+			);
+
 		drupal_set_message(t('Event Updated'));
 	}
 	else
@@ -251,13 +252,13 @@ function conschedule_event_view($event_id){
 	assert($event_id > 0);
 
 	$result = db_query('SELECT 
-			r_roomname,
-			e_roomid, e_eventname, e_color,
-			e_datestart, e_dateend, 
-			e_eventdesc, e_panelist
-			FROM {conschedule_events}
-			LEFT JOIN {conschedule_rooms} ON e_roomid = r_roomid
-			WHERE e_eventid = %d', $event_id);
+		r_roomname,
+		e_roomid, e_eventname, e_color,
+		e_datestart, e_dateend, 
+		e_eventdesc, e_panelist
+		FROM {conschedule_events}
+		LEFT JOIN {conschedule_rooms} ON e_roomid = r_roomid
+		WHERE e_eventid = %d', $event_id);
 	$data = db_fetch_object($result);
 
 	if($data === FALSE)
@@ -275,6 +276,7 @@ function conschedule_event_view($event_id){
 		$data->e_panelist = 'Panelist not assigned to this event yet';
 	}
 
+
 	//TODO should probably use the theme engine.
 	$time = date('F jS g:i a',strtotime($data->e_datestart)) . ' - ' . date('g:i a',strtotime($data->e_dateend));
 	$out = '';
@@ -285,6 +287,21 @@ function conschedule_event_view($event_id){
 	$out .= "<p><strong>Panelist:</strong> {$data->e_panelist}</p>";
 	$out .= '<p><strong>Description:</strong><br>';
    	$out .= nl2br($data->e_eventdesc) . '</p>';
+
+
+	//Next/Previous links
+	$result = db_query("SELECT e_eventid FROM {conschedule_events} WHERE e_roomid = %d AND e_datestart < '%s' ORDER BY e_datestart DESC",
+		$data->e_roomid, $data->e_datestart);
+	$row = db_fetch_object($result);
+	
+	$out .= '<a href="'.url('schedule/event/'.$row->e_eventid.'/view').'">Previous Event</a>&nbsp;';
+
+	$result = db_query("SELECT e_eventid FROM {conschedule_events} WHERE e_roomid = %d AND e_datestart > '%s' ORDER BY e_datestart ASC",
+		$data->e_roomid, $data->e_dateend);
+	$row = db_fetch_object($result);
+	
+	$out .= '<a href="'.url('schedule/event/'.$row->e_eventid.'/view').'">Next Event</a>';
+
 
 	//userschedule
 	if(user_is_logged_in())

@@ -54,9 +54,9 @@ function conschedule_menu(){
 	$items['schedule'] = array(
 		'title' => 'Schedule',
 		'type' => MENU_NORMAL_ITEM,
+		'menu_name' => 'primary-links', //show in menu
 		'page callback' => 'conschedule_home',
 		'access arguments' => array('access content'),
-		'menu_name' => 'primary-links', //show in menu
 		'file' => 'conschedule.inc',
 	);
 	$items['schedule/kiosk'] = array(
@@ -109,10 +109,11 @@ function conschedule_menu(){
 	);
 
 	//Room (add, edit, delete, and list)
-	$items['schedule/room/%'] = array(
+	$items['schedule/room'] = array(
 		'title' => 'Room',
 		'page callback' => 'conschedule_room',
-		'page arguments' => array(2),
+		'type' => MENU_NORMAL_ITEM,
+		'menu_name' => 'primary-links', //show in menu
 		'access arguments' => array('administer conschedule'),
 		'file' => 'room.inc',
 	);
@@ -152,7 +153,8 @@ function conschedule_menu(){
 	//User Schedule
 	$items['schedule/userschedule'] = array (
 		'title' => 'User Schedule',
-		'type' => MENU_CALLBACK,
+		'type' => MENU_NORMAL_ITEM,
+		'menu_name' => 'primary-links', //show in menu
 		'page callback' => 'conschedule_usersched',
 		'access arguments' => array('authenticated user'),
 		'file' => 'userschedule.inc',
@@ -171,6 +173,73 @@ function conschedule_menu(){
 		'file' => 'userschedule.inc',
 		'page arguments' => array(3),
 	);
+
+	//Tags, in Dylan's words, "This is a complex piece of machinery, that's why I've avoided doing it for so long"
+	//He's not wrong, see tags.inc for more info!
+	$items['schedule/tag'] = array (
+		'title' => 'Tags', //List Tags
+		'type' => MENU_NORMAL_ITEM,
+		'menu_name' => 'primary-links', //show in menu
+		'page callback' => 'conschedule_tag',
+		'access arguments' => array('administer conschedule'),
+		'file' => 'tags.inc',
+	);
+	$items['schedule/tag/%/list'] = array (
+		'title' => 'List', //Edit Tag
+		'type' => MENU_DEFAULT_LOCAL_TASK,
+		'page callback' => 'conschedule_tag',
+		'access arguments' => array('administer conschedule'),
+		'file' => 'tags.inc',
+		'page arguments' => array(2,3),
+	);
+	/*
+	$items['schedule/tags/tag/%/list'] = array (
+		'title' => 'List', //Edit Tag
+		'type' => MENU_CALLBACK,
+		'page callback' => 'conschedule_tag',
+		'access arguments' => array('administer conschedule'),
+		'file' => 'tags.inc',
+		'page arguments' => array(3),
+	);
+	$items['schedule/tags/tag/%/delete'] = array (
+		'title' => 'Tag', //Edit Tag
+		'type' => MENU_CALLBACK,
+		'page callback' => 'conschedule_tag',
+		'access arguments' => array('administer conschedule'),
+		'file' => 'tags.inc',
+		'page arguments' => array(3),
+	);
+	$items['schedule/tags/tag/%/edit'] = array (
+		'title' => 'Tag', //Edit Tag
+		'type' => MENU_CALLBACK,
+		'page callback' => 'conschedule_tag',
+		'access arguments' => array('administer conschedule'),
+		'file' => 'tags.inc',
+		'page arguments' => array(3),
+	);
+	$items['schedule/tags/tagday/%/%'] = array (
+		'title' => 'Tag Day', //Edit Tag Day
+		'type' => MENU_CALLBACK,
+		'page callback' => 'conschedule_tagday',
+		'access arguments' => array('administer conschedule'),
+		'file' => 'tags.inc',
+		'page arguments' => array(3),
+	);
+	$items['schedule/tags/tag/%/%/roomadd/%'] = array (
+		'type' => MENU_CALLBACK,
+		'page callback' => 'conschedule_tag_room_add',
+		'access arguments' => array('administer conschedule'),
+		'file' => 'tags.inc',
+		'page arguments' => array(2,3,5),
+	);
+	$items['schedule/tags/%/%/roomdel/%'] = array (
+		'type' => MENU_CALLBACK,
+		'page callback' => 'conschedule_tag_room_del',
+		'access arguments' => array('administer conschedule'),
+		'file' => 'tags.inc',
+		'page arguments' => array(2,3,5),
+	);
+	*/
 
 	return $items;
 }

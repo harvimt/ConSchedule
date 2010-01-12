@@ -29,6 +29,7 @@ class ConSchedule {
 	private $startDate = NULL;
 	private $endDate = NULL;
 	private $custom_startStop = FALSE;
+	private $in_usched = array();
 
 	public function calcStartAndEndTimes()
 	{
@@ -128,22 +129,48 @@ class ConSchedule {
 	function getData()
 	{
 		global $conschedule_global;
+		global $user;
 
 		$this->schedule = NULL;
 
 		// events query
-		$result = db_query("
-		SELECT 
-			e_eventid, e_eventname, r_roomname, e_datestart, 
-			e_dateend, e_eventname, e_eventdesc, e_color, e_panelist
-		FROM 
-			{conschedule_events}, {conschedule_rooms}
-		WHERE 
-			e_roomid = r_roomid AND
-			e_datestart BETWEEN '%s' AND '%s'
-		ORDER BY
-			r_roomID ASC
-		;", $this->startDate->format("Y-m-d H:i:s"), $this->endDate->format("Y-m-d H:i:s"));
+		if(user_is_logged_in())
+		{
+			//,
+			//
+			//
+					 
+			$result = db_query("
+			SELECT 
+				CASE WHEN us_uschedid IS NULL THEN 0 ELSE 1 END as in_u_sched,
+				e_eventid, e_eventname, r_roomname, e_datestart, 
+				e_dateend, e_eventname, e_eventdesc, e_color, e_panelist
+			FROM {conschedule_events}
+			INNER JOIN {conschedule_rooms} ON e_roomid = r_roomid 
+			LEFT JOIN {conschedule_userschedule} ON us_eventid = e_eventid
+			WHERE 
+				e_datestart BETWEEN '%s' AND '%s'
+				AND (us_userid = %d OR us_uschedid IS NULL)
+			ORDER BY
+				r_roomid ASC
+			;", $this->startDate->format("Y-m-d H:i:s"), $this->endDate->format("Y-m-d H:i:s"), $user->uid);
+		}
+		else
+		{
+			$result = db_query("
+			SELECT 
+				0 as in_u_sched,
+				e_eventid, e_eventname, r_roomname, e_datestart, 
+				e_dateend, e_eventname, e_eventdesc, e_color, e_panelist
+			FROM 
+				{conschedule_events}, {conschedule_rooms}
+			WHERE 
+				e_roomid = r_roomid AND
+				e_datestart BETWEEN '%s' AND '%s'
+			ORDER BY
+				r_roomID ASC
+			;", $this->startDate->format("Y-m-d H:i:s"), $this->endDate->format("Y-m-d H:i:s"));
+		}
 
 		$row = db_fetch_object($result);
 		if( $row == NULL ) 
@@ -178,6 +205,7 @@ class ConSchedule {
 		// create the events and this->roomNames arrays
 		$this->roomNames = array();
 		$events = array();
+		$events_in_usched = array();
 		do
 		{
 			$events[] = new Event( 
@@ -189,6 +217,11 @@ class ConSchedule {
 			{
 				$this->roomNames[] = $row->r_roomname;
 			}
+			if( $row->in_u_sched == 1)
+			{
+				$this->in_usched[] = $row->e_eventid;
+			}
+
 		}
 		while( $row = db_fetch_object($result));
 
@@ -293,14 +326,7 @@ class ConSchedule {
 			$endDate = $this->endDate;
 		}
 
-		if(is_null($startDate) || is_null($endDate) || is_null($this->roomNames) || is_null($this->schedule))
-		{
-			//Preconditions failed, do something dramatic
-		}
-		/*
-		con_dump($startDate);
-		con_dump($endDate);
-		*/
+		assert(!is_null($startDate) && !is_null($endDate) && !is_null($this->roomNames) && !is_null($this->schedule));
 
 		// only print 24 hours from beginning time
 		$dayCheck = clone($startDate);
@@ -353,8 +379,19 @@ class ConSchedule {
 						$size = $event->getEventLengthInHalfHours();
 						$eventID = $event->getEventID();
 						
-						echo "<td class=\"foundEvent\" rowspan=\"$size\" style=\"background-color:$color\">
+						$extraclass = '';
+						if(in_array($eventID, $this->in_usched))
+						{
+							$extraclass = ' inusched';
+						}
+
+						echo "<td class=\"foundEvent$extraclass\" rowspan=\"$size\" style=\"background-color:$color\">
 						<div class=\"event_container\">";
+
+						if($extraclass == ' inusched')
+						{
+							echo '<div class="usched_badge"></div>';
+						}
 						
 						if($size > 1){
 							echo "<div class=\"startTime\">

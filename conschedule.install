@@ -146,5 +146,109 @@ function conschedule_schema() {
 		'primary key' =>  array('r_roomid'),
 	); 
 
+	//Convention Tags, (new in 0.2)
+	$schema['conschedule_tags'] = array(
+		'description' => 'Rooms on the conschedule',
+		'fields' => array(
+			't_tagname' => array(
+			   'type' => 'varchar',
+			   'length' => 40,
+			   'not null' => TRUE,
+			),
+			't_day' => array(
+				'type' => 'int',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+			),
+			't_datestart' => array(
+				'type' => 'datetime',
+				'not null' => TRUE,
+				'default' => '0000-00-00 00:00:00',
+			),
+			't_dateend' => array(
+				'type' => 'datetime',
+				'not null' => TRUE,
+				'default' => '0000-00-00 00:00:00',
+			),
+		),
+		'primary key' =>  array('t_tagid'),
+	); 
+
+	$schema['conschedule_tags_rooms'] = array(
+		'description' => 'Rooms on the conschedule',
+		'fields' => array(
+			'tr_trid' => array(
+				'type' => 'serial',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+			),
+			'tr_tagid' => array(
+				'type' => 'int',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+			),
+			'tr_roomid' => array(
+				'type' => 'int',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+			),
+		),
+		'primary key' =>  array('t_tagname', 't_day'),
+	);
+
 	return $schema;
+}
+
+function conschedule_update_6001(&$sandbox)
+{
+	$schema = array();
+	$schema['conschedule_tags'] = array(
+		'description' => 'Convention Tags',
+		'fields' => array(
+			't_tagname' => array(
+			   'type' => 'varchar',
+			   'length' => 40,
+			   'not null' => TRUE,
+			),
+			't_day' => array(
+				'type' => 'int',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+			),
+			't_datestart' => array(
+				'type' => 'datetime',
+				'not null' => TRUE,
+				'default' => '0000-00-00 00:00:00',
+			),
+			't_dateend' => array(
+				'type' => 'datetime',
+				'not null' => TRUE,
+				'default' => '0000-00-00 00:00:00',
+			),
+		),
+		'primary key' =>  array('t_tagname', 't_day'),
+	); 
+
+	$schema['conschedule_tags_rooms'] = array(
+		'description' => 'Map Rooms to Tags',
+		'fields' => array(
+			'tr_trid' => array(
+				'type' => 'serial',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+			),
+			'tr_tagid' => array(
+				'type' => 'int',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+			),
+			'tr_roomid' => array(
+				'type' => 'int',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+			),
+		),
+		'primary key' =>  array('r_roomid'),
+	);
+
 }
