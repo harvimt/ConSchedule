@@ -145,8 +145,6 @@ class ConSchedule {
 			r_roomID ASC
 		;", $this->startDate->format("Y-m-d H:i:s"), $this->endDate->format("Y-m-d H:i:s"));
 
-		//$eventCount = mysql_num_rows($result); //TODO: really shouldn't do this, but uhm, it's the easiest solution, 
-		//and the "preffered solution is to perform antoher query, which doesn't seem correct
 		$row = db_fetch_object($result);
 		if( $row == NULL ) 
 		{
@@ -166,19 +164,14 @@ class ConSchedule {
 			}
 
 
-			//TODO
-			if( user_access('administer conschedule') )
+			if( ! user_access('administer conschedule') )
 			{
 				drupal_set_message("Please check back later. We'll be posting events soon =^.^=",'status');
 			}
-			//else
-			//{
-				/*TODO
-				echo "Oi, you: ";
-				$page->addURL("add.php","add an event");
-				echo "!"; 
-				*/
-			//}
+			else
+			{
+				echo 'Oi, you:  <a href="'.url('schedule/event/0/add').'">Add an Event</a>!'; 
+			}
 			return;
 		}
 
@@ -388,9 +381,8 @@ class ConSchedule {
 					{
 						if( user_access('administer conschedule') )
 						{
-							//TODO
 							echo "<td>";
-							$path = url("/schedule/event/0/add/",array('query'=>array('room'=>$roomName,'date'=>$tableTime->format('YmdHis'))));
+							$path = url("schedule/event/0/add/",array('query'=>array('room'=>$roomName,'date'=>$tableTime->format('YmdHis'))));
 							echo "<a href=\"$path\">+</a>";
 							echo "</td>";
 						}
@@ -414,7 +406,6 @@ class ConSchedule {
 
 function conschedule_home(){
 	$conschedule_path = drupal_get_path('module','conschedule');
-	include_once($conschedule_path . '/conschedule.inc');
 	include_once($conschedule_path . '/Event.php');
 	
 	$cs = new ConSchedule();
@@ -424,7 +415,6 @@ function conschedule_home(){
 //:=> /schedule/kiosk
 function conschedule_kiosk(){
 	$conschedule_path = drupal_get_path('module','conschedule');
-	include_once($conschedule_path . '/conschedule.inc');
 	include_once($conschedule_path . '/Event.php');
 
 	$cs = new ConSchedule();

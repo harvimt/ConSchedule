@@ -1,4 +1,5 @@
 <?php
+// vim: syn=php
 /*
  *      conschedule.module
  *      
@@ -20,7 +21,6 @@
  *      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  *      MA 02110-1301, USA.
  */
-// vim: syn=php
 
 //implements hook_init
 function conschedule_init(){
@@ -147,6 +147,29 @@ function conschedule_menu(){
 		'page arguments' => array(2,3),
 		'access arguments' => array('administer conschedule'),
 		'file' => 'room.inc',
+	);
+
+	//User Schedule
+	$items['schedule/userschedule'] = array (
+		'title' => 'User Schedule',
+		'type' => MENU_CALLBACK,
+		'page callback' => 'conschedule_usersched',
+		'access arguments' => array('authenticated user'),
+		'file' => 'userschedule.inc',
+	);
+	$items['schedule/userschedule/addevent/%'] = array (
+		'type' => MENU_CALLBACK,
+		'page callback' => 'conschedule_usersched_add_event',
+		'access arguments' => array('authenticated user'),
+		'file' => 'userschedule.inc',
+		'page arguments' => array(3),
+	);
+	$items['schedule/userschedule/delevent/%'] = array (
+		'type' => MENU_CALLBACK,
+		'page callback' => 'conschedule_usersched_del_event',
+		'access arguments' => array('authenticated user'),
+		'file' => 'userschedule.inc',
+		'page arguments' => array(3),
 	);
 
 	return $items;

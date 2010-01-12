@@ -1,4 +1,5 @@
 <?php
+// vim: syn=php
 /*
  *      room.inc
  *      
@@ -20,11 +21,8 @@
  *      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  *      MA 02110-1301, USA.
  */
-// vim: syn=php
 
 function conschedule_room($room_id=NULL,$op='list'){
-	$conschedule_path = drupal_get_path('module','conschedule');
-	include_once($conschedule_path . '/room.inc');
 	
 	if($op == 'list')
 	{
@@ -162,8 +160,8 @@ function conschedule_room_list()
 	{
 		$rows[]= array(
 			'name' => $row->r_roomname,
-			'edit' => '<a href="'.url('/schedule/room/'.$row->r_roomid.'/edit').'">Edit</a>',
-			'delete' => '<a href="'.url('/schedule/room/'.$row->r_roomid.'/delete').'">Delete</a>',
+			'edit' => '<a href="'.url('schedule/room/'.$row->r_roomid.'/edit').'">Edit</a>',
+			'delete' => '<a href="'.url('schedule/room/'.$row->r_roomid.'/delete').'">Delete</a>',
 		);
 	}
 	$headers = array('Room Name','','');

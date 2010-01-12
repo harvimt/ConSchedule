@@ -1,4 +1,5 @@
 <?php
+//vim: syn=php
 /*
  *      event.inc
  *      
@@ -20,12 +21,8 @@
  *      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  *      MA 02110-1301, USA.
  */
-//vim: syn=php
 
 function conschedule_event($event_id,$op='view'){
-	$conschedule_path = drupal_get_path('module','conschedule');
-	include_once($conschedule_path . '/event.inc');
-
 	if($op == 'view')
 	{
 		return conschedule_event_view($event_id);
@@ -42,9 +39,12 @@ function conschedule_event_form($form_state, $event_id, $op)
 	//Preconditions
 	assert(is_numeric($event_id));
 	assert(in_array($op, array('add','edit', 'delete')));
-	if($op == 'view' || $op == 'edit'){
+	if($op == 'view' || $op == 'edit')
+	{
 		assert($event_id > 0);
-	}else {
+	}
+	else
+	{
 		//assert($event_id == 0);
 	}
 
@@ -207,7 +207,7 @@ function conschedule_event_form_submit($form, &$form_state)
 	if($form_state['values']['_op'] == 'delete'){
 		db_query('DELETE FROM {conschedule_events} WHERE e_eventid = %d', $form_state['values']['eventid']);
 		drupal_set_message(t('Event Deleted Successfully'));
-		drupal_goto('/schedule');
+		drupal_goto('schedule');
 	}
 	else if($form_state['values']['_op'] == 'add')
 	{
@@ -246,8 +246,10 @@ function conschedule_event_form_submit($form, &$form_state)
 }
 
 function conschedule_event_view($event_id){
+	global $user;
 	assert(is_numeric($event_id));
 	assert($event_id > 0);
+
 	$result = db_query('SELECT 
 			r_roomname,
 			e_roomid, e_eventname, e_color,
@@ -258,21 +260,52 @@ function conschedule_event_view($event_id){
 			WHERE e_eventid = %d', $event_id);
 	$data = db_fetch_object($result);
 
-	if($data === FALSE){
+	if($data === FALSE)
+	{
 		drupal_set_message('No Event with id, ' . $event_id, 'error');
+	}
+
+	if($data->e_eventdesc == '')
+	{
+		$data->e_eventdesc = 'Panelist did not supply a description of this event';
+	}
+
+	if($data->e_panelist == '')
+	{
+		$data->e_panelist = 'Panelist not assigned to this event yet';
 	}
 
 	//TODO should probably use the theme engine.
 	$time = date('F jS g:i a',strtotime($data->e_datestart)) . ' - ' . date('g:i a',strtotime($data->e_dateend));
 	$out = '';
-	$out .= "<p><strong>Title</strong>: {$data->e_eventname}</p>";
-	$out .= '<p><strong>Description</strong>:</p>';
-   	$out .= '<p>' . nl2br($data->e_eventdesc) . '</p>';
-	$out .= "<p><strong>Room Name</strong>: {$data->r_roomname}</p>";
-	$out .= "<p><strong>Time</strong>: $time</p>";
-	$out .= "<p><strong>Color</strong>: <span style=\"background-color:{$data->e_color}\">{$data->e_color}</span></p>";
-	$out .= "<p><strong>Panelist</strong>: {$data->e_panelist}</p>";
+	$out .= "<p><strong>Title:</strong> {$data->e_eventname}</p>";
+	$out .= "<p><strong>Room:</strong> {$data->r_roomname}</p>";
+	$out .= "<p><strong>Time:</strong> $time</p>";
+	//$out .= "<p><strong>Color</strong>: <span style=\"background-color:{$data->e_color}\">{$data->e_color}</span></p>";
+	$out .= "<p><strong>Panelist:</strong> {$data->e_panelist}</p>";
+	$out .= '<p><strong>Description:</strong><br>';
+   	$out .= nl2br($data->e_eventdesc) . '</p>';
 
-	//TODO userschedule
+	//userschedule
+	if(user_is_logged_in())
+	{
+		$result = db_query('SELECT us_uschedid FROM {conschedule_userschedule} WHERE us_eventid = %d AND us_userid = %d',
+			$event_id, $user->uid);
+
+		if( db_fetch_array($result) === FALSE)
+		{
+			$out .= '<p><a href="'.url('schedule/userschedule/addevent/'.$event_id).'">Add to user Schedule </a></p>';
+		}
+		else
+		{
+			$out .= '<p><a href="'.url('schedule/userschedule/delevent/'.$event_id).'">Remove From User Schedule</a></p>';
+		}
+		$out .= '<p><a href="'.url('schedule/userschedule').'">View your schedule</a></p>';
+	}
+	else
+	{
+		//TODO: to the forums? link?
+		$out .= '<p>Log in or register to add this event to your own custom schedule!';
+	}
 	return $out;
 }
