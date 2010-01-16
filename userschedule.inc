@@ -244,7 +244,7 @@ ORDER BY
 function conschedule_usersched_add_event($event_id)
 {
 	global $user;
-	assert(is_numeric($event_id));
+	assert(is_int($event_id));
 
 	$result = db_query('SELECT us_uschedid FROM {conschedule_userschedule} WHERE us_eventid = %d AND us_userid = %d',
 		$event_id, $user->uid);
@@ -266,7 +266,7 @@ function conschedule_usersched_add_event($event_id)
 function conschedule_usersched_del_event($event_id)
 {
 	global $user;
-	assert(is_numeric($event_id));
+	assert(is_int($event_id));
 
 	$result = db_query('DELETE FROM {conschedule_userschedule} WHERE us_eventid = %d AND us_userid = %d',
 		$event_id, $user->uid);

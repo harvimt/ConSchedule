@@ -23,7 +23,6 @@
  */
 
 function conschedule_room($room_id=NULL,$op='list'){
-	
 	if($op == 'list')
 	{
 		return conschedule_room_list();
@@ -41,7 +40,7 @@ function conschedule_room_form($form_state, $room_id, $op)
 	//Preconditions
 	if($op != 'add')
 	{
-		assert(is_numeric($room_id));
+		assert(is_int($room_id));
 	}
 	assert(in_array($op, array('add','edit', 'delete')));
 	if($op == 'edit'){
@@ -152,7 +151,6 @@ function conschedule_room_form_submit($form, &$form_state)
 	{
 		drupal_set_message(t('hit else, shouldn\'t do that, op: ' . $form_state['values']['_op']),'error');
 	}
-
 }
 
 function conschedule_room_list()

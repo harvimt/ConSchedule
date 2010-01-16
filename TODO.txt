@@ -1,0 +1,32 @@
+.h1 ConSchedule as Drupal Module TODO list
+
+.h2 High Priority
+
+* Add a table to the database that allows the "tagging" of date ranges.
+** replaces conTimes variables and con day concept
+(e.g. index.php?tag=mew2008 will pull up the events for mew 2008.)
+** Tags have a name, a set of rooms, and a set of TagDays
+** TagDays have a date range (start time, stop time) and a day number
+** /schedule and /schedule/kiosk need to take in _GET['date'] _GET['startTime'] _GET['stopTime'] or _GET['tag'] and _GET['day']
+
+.h2 Medium Priority
+* Auto-Calculate color of events instead of setting the color set, 18+, normal, or open event as event type
+** This will require a database change (deletion of e_color column and addition of "e_event_type" column)
+
+.h2 Low Piority
+* userSchedule has a day separator based on con tags rather than midnight.
+* ability to re-order rooms
+
+.h2 Optional / Brainstorm
+* Allow grouping/filtering by room or name in userSchedule 
+(e.g. userSchedule.php?orderBy='room' will group all rooms together, where userSchedule.php?room=0 will only display roomID 0)
+* Ability to filter by panelist. Will require a Panelists table and a slight restructure of the Events table. This will also allow multiple panelists to host a single panel.
+* Add a compact view option to index that groups rooms together (e.g. a header for "Room 1" with a compact list of all its events - ordered by time, followed by a header for "Room 2," etc). ( could also do something similar as "view room")
+* use theming api to allow drupal themes to theme conschedule (for schedule,"view event", and user schedule only probably)
+
+.h2 Completed
+* Have the main schedule allow admins to start adding an event from a certain time.
+* Add previous/next event links when viewing an event. (could be styled better)
+* choose between left-align with padding or center align with no padding for event titles in schedule (I prefer centered no padding, Kaku's code had left-align with padding originally, that's what I've left it as for the moment). (left chosen)
+* Add some sort of visual way to know which events a User is signed up for in the Event Schedule, whether by changing the background color or adding a badge or whatever.
+* restricted time entry to 30 minute segments.

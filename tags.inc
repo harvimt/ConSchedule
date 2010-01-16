@@ -69,7 +69,7 @@ function conschedule_tag_list()
 function conschedule_tag_form($form_state, $tag_id, $op)
 {
 	assert(in_array($op, array('add','edit','delete')));
-	assert(is_numeric($tag_id));
+	assert(is_int($tag_id));
 
 	//con_dump($form_state);
 	//con_dump($tag_id);
@@ -251,10 +251,11 @@ function conschedule_tag_form_submit($form,&$form_state)
 	}
 }
 
+//##TAG ROOM HANDLING
 function conschedule_tag_roomadd($tag_id, $room_id)
 {
-	assert(is_numeric($room_id));
-	assert(is_numeric($tag_id));
+	assert(is_int($room_id));
+	assert(is_int($tag_id));
 
 	$result = db_query('DELETE FROM {conschedule_tags_rooms} WHERE tr_tagid = %d AND tr_roomid = %d',
 		$tag_id, $room_id);
@@ -273,8 +274,8 @@ function conschedule_tag_roomadd($tag_id, $room_id)
 
 function conschedule_tag_roomrem($tag_id, $room_id)
 {
-	assert(is_numeric($room_id));
-	assert(is_numeric($tag_id));
+	assert(is_int($room_id));
+	assert(is_int($tag_id));
 
 	$result = db_query('SELECT tr_trid FROM {conschedule_tags_rooms} WHERE tr_tagid = %d AND tr_roomid = %d',
 		$tag_id, $room_id);
@@ -293,8 +294,131 @@ function conschedule_tag_roomrem($tag_id, $room_id)
 	drupal_goto('schedule/tag/'.$tag_name.'/edit');
 }
 
-function conschedule_tagday($tag_name = null, $tag_day = 0, $op='list')
+//##TAG DAY
+function conschedule_tagday($tag_id = null, $tag_day = 0, $op='edit')
 {
-	return 'Under Construction (tag day); name: ' . $tag_name . '; tag_day: '.$tag_day.' op: ' . $op;
+	return drupal_get_form('conschedule_tagday_form', $tag_id, $tag_day $op);
 }
 
+function conschedule_tagday_form($form_state, $tag_id, $tag_day, $op)
+{
+	//Preconditions
+	assert(is_int($tag_id));
+	assert($tag_id >= 0);
+	assert(is_int($tag_day));
+	assert($tag_day >= 0);
+	assert(in_array($op, array('add','edit','delete')));
+
+	$form = array(
+		'tagid' => array(
+			'#type' => 'hidden',
+			'#value' => $tag_id,
+		),
+		'tagday' => array(
+			'#type' => 'hidden',
+			'#value' => $tag_day
+		)
+		'_op' => array(
+			'#type' => 'hidden',
+			'#value' => $op,
+		),
+		'submit' => array(
+			'#type' => 'submit',
+			'#value' => t('Save'),
+		),
+	);
+
+	if($op == 'delete')
+	{
+		$form['title'] = array('#value'=>'Are you sure you want to delete this tag day?');
+		$form['submit']['#value'] = 'Yes';
+	}
+
+	if($op == 'edit')
+	{
+		$result = db_query('SELECT td_datestart, td_dateend FROM {conschedule_tagdays} WHERE td_tagid = %d AND td_day = %d',
+			$tag_id, $tag_day);
+		$data = db_fetch_object($result);
+		if($data === FALSE)
+		{
+			drupal_set_message('No such Tag Day','error');
+		}
+	}
+	else
+	{
+		$data = new stdClass();
+		$data->td_datestart = date('Y-m-d H:i',strtotime('now'));
+		$data->td_dateend = date('Y-m-d H:i',strtotime('+ 1 day'));
+	}
+	
+	$form['startTime'] = array(
+		'#type' => 'date_popup',
+		'#title' => t('Start Date'),
+		'#default_value' => $data->e_datestart,
+		'#date_increment' => 30,
+	);
+	$form['endTime' = array(
+		'#type' => 'date_popup',
+		'#title' => t('End Date'),
+		'#default_value' => $data->e_dateend,
+		'#date_increment' => 30,
+	);
+
+	return $form;
+}
+
+function conschedule_tagday_form_validate($form, &$form_state)
+{
+
+}
+
+function conschedule_tagday_form_submit($form, &$form_state)
+{
+	if($form_state['values']['_op'] == 'delete')
+	{
+		$result = db_query('DELETE FROM {conschedule_tagdays} WHERE td_tagid = %d AND td_day',
+			$form_state['values']['tagid'], $form_state['values']['tagday']);
+
+		if(db_affected_rows($result) == 1)
+		{
+			db_set_message('Tag day deleted successfully');
+		}
+		else
+		{
+			db_set_message('There was an error while deleting a Tag Day','error');
+		}
+	}
+	else if($form_state['values']['_op'] == 'add')
+	{
+		$result = db_query('INSERT INTO {conschedule_tagdays} (td_tagid,td_day,td_datestart,td_dateend) VALUES (%d,%d,\'%s\',\'%s\')',
+			$form_state['values']['tagid'], $form_state['values']['tagday'],
+			$form_state['values']['td_datestart'], $form_state['values']['td_dateend']);
+
+		if(db_affected_rows($result))
+		{
+			drupal_set_message('Tag day added successfully');
+			drupal_goto('schedule/tag/'.$form_state['values']['tagid'].'/edit');
+		}else{
+			db_set_message('There was an error while deleting a Tag Day','error');
+		}
+	}
+	else if($form_state['values']['_op'] == 'edit')
+	{
+		
+		$result = db_query('UPDATE {conschedule_tagdays} SET td_tagid = %d,td_day = %d,td_datestart = \'%s\',td_dateend = \'%s\')',
+			$form_state['values']['tagid'], $form_state['values']['tagday'],
+			$form_state['values']['td_datestart'], $form_state['values']['td_dateend']);
+
+		if(db_affected_rows($result))
+		{
+			drupal_set_message('Tag day updated successfully');
+			drupal_goto('schedule/tag/'.$form_state['values']['tagid'].'/edit');
+		}else{
+			db_set_message('There was an error while deleting a Tag Day','error');
+		}
+	}
+	else
+	{
+		drupal_set_message('Hit else, this shouldn\' happen','error');
+	}
+}
