@@ -297,7 +297,7 @@ function conschedule_tag_roomrem($tag_id, $room_id)
 //##TAG DAY
 function conschedule_tagday($tag_id = null, $tag_day = 0, $op='edit')
 {
-	return drupal_get_form('conschedule_tagday_form', $tag_id, $tag_day $op);
+	return drupal_get_form('conschedule_tagday_form', $tag_id, $tag_day, $op);
 }
 
 function conschedule_tagday_form($form_state, $tag_id, $tag_day, $op)
@@ -317,7 +317,7 @@ function conschedule_tagday_form($form_state, $tag_id, $tag_day, $op)
 		'tagday' => array(
 			'#type' => 'hidden',
 			'#value' => $tag_day
-		)
+		),
 		'_op' => array(
 			'#type' => 'hidden',
 			'#value' => $op,
@@ -357,19 +357,17 @@ function conschedule_tagday_form($form_state, $tag_id, $tag_day, $op)
 		'#default_value' => $data->e_datestart,
 		'#date_increment' => 30,
 	);
-	$form['endTime' = array(
+	$form['endTime'] = array(
 		'#type' => 'date_popup',
 		'#title' => t('End Date'),
 		'#default_value' => $data->e_dateend,
 		'#date_increment' => 30,
 	);
-
 	return $form;
 }
 
 function conschedule_tagday_form_validate($form, &$form_state)
 {
-
 	if($form_state['values']['_op'] != 'delete'){
 		$startTime = date_create($form_state['values']['startTime']);
 		$endTime = date_create($form_state['values']['endTime']);
