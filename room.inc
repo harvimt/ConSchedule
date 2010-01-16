@@ -39,7 +39,10 @@ function conschedule_room($room_id=NULL,$op='list'){
 function conschedule_room_form($form_state, $room_id, $op)
 {
 	//Preconditions
-	assert(is_numeric($room_id));
+	if($op != 'add')
+	{
+		assert(is_numeric($room_id));
+	}
 	assert(in_array($op, array('add','edit', 'delete')));
 	if($op == 'edit'){
 		assert($room_id > 0);
@@ -55,7 +58,7 @@ function conschedule_room_form($form_state, $room_id, $op)
 		$room_name = $data->r_roomname;
 		return array(
 				'title' => array(
-					'#value' => "Are you sure you want to delete the event \"$room_name\"?",
+					'#value' => "Are you sure you want to delete the room \"$room_name\"?",
 				),
 				'roomid' => array(
 					'#type' => 'hidden',

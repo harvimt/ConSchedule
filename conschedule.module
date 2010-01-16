@@ -176,8 +176,11 @@ function conschedule_menu(){
 
 	//Tags, in Dylan's words, "This is a complex piece of machinery, that's why I've avoided doing it for so long"
 	//He's not wrong, see tags.inc for more info!
+
+
+	//Tag
 	$items['schedule/tag'] = array (
-		'title' => 'Tags', //List Tags
+		'title' => 'Tag',
 		'type' => MENU_NORMAL_ITEM,
 		'menu_name' => 'primary-links', //show in menu
 		'page callback' => 'conschedule_tag',
@@ -185,61 +188,87 @@ function conschedule_menu(){
 		'file' => 'tags.inc',
 	);
 	$items['schedule/tag/%/list'] = array (
-		'title' => 'List', //Edit Tag
+		'title' => 'List',
 		'type' => MENU_DEFAULT_LOCAL_TASK,
 		'page callback' => 'conschedule_tag',
 		'access arguments' => array('administer conschedule'),
 		'file' => 'tags.inc',
 		'page arguments' => array(2,3),
 	);
-	/*
-	$items['schedule/tags/tag/%/list'] = array (
-		'title' => 'List', //Edit Tag
-		'type' => MENU_CALLBACK,
+	$items['schedule/tag/%/add'] = array (
+		'title' => 'Add',
+		'type' => MENU_LOCAL_TASK,
 		'page callback' => 'conschedule_tag',
 		'access arguments' => array('administer conschedule'),
 		'file' => 'tags.inc',
-		'page arguments' => array(3),
+		'page arguments' => array(2,3),
 	);
-	$items['schedule/tags/tag/%/delete'] = array (
-		'title' => 'Tag', //Edit Tag
-		'type' => MENU_CALLBACK,
+	$items['schedule/tag/%/delete'] = array (
+		'title' => 'Delete',
+		'type' => MENU_LOCAL_TASK,
 		'page callback' => 'conschedule_tag',
 		'access arguments' => array('administer conschedule'),
 		'file' => 'tags.inc',
-		'page arguments' => array(3),
+		'page arguments' => array(2,3),
 	);
-	$items['schedule/tags/tag/%/edit'] = array (
-		'title' => 'Tag', //Edit Tag
-		'type' => MENU_CALLBACK,
+	$items['schedule/tag/%/edit'] = array (
+		'title' => 'Edit',
+		'type' => MENU_LOCAL_TASK,
 		'page callback' => 'conschedule_tag',
 		'access arguments' => array('administer conschedule'),
 		'file' => 'tags.inc',
-		'page arguments' => array(3),
+		'page arguments' => array(2,3),
 	);
-	$items['schedule/tags/tagday/%/%'] = array (
-		'title' => 'Tag Day', //Edit Tag Day
+
+	$items['schedule/tag/%/roomadd/%'] = array (
 		'type' => MENU_CALLBACK,
+		'page callback' => 'conschedule_tag_roomadd',
+		'access arguments' => array('administer conschedule'),
+		'file' => 'tags.inc',
+		'page arguments' => array(2,4),
+	);
+	$items['schedule/tag/%/roomrem/%'] = array (
+		'title' => 'Edit',
+		'type' => MENU_CALLBACK,
+		'page callback' => 'conschedule_tag_roomrem',
+		'access arguments' => array('administer conschedule'),
+		'file' => 'tags.inc',
+		'page arguments' => array(2,4),
+	);
+
+	//Tag Day
+	$items['schedule/tag/%/tagday/%'] = array (
+		'title' => 'Tag Day',
+		'type' => MENU_NORMAL_ITEM,
 		'page callback' => 'conschedule_tagday',
 		'access arguments' => array('administer conschedule'),
 		'file' => 'tags.inc',
-		'page arguments' => array(3),
+		'page arguments' => array(2,4),
 	);
-	$items['schedule/tags/tag/%/%/roomadd/%'] = array (
-		'type' => MENU_CALLBACK,
-		'page callback' => 'conschedule_tag_room_add',
+	$items['schedule/tag/%/tagday/%/edit'] = array (
+		'title' => 'Edit',
+		'type' => MENU_DEFAULT_LOCAL_TASK,
+		'page callback' => 'conschedule_tagday',
 		'access arguments' => array('administer conschedule'),
 		'file' => 'tags.inc',
-		'page arguments' => array(2,3,5),
+		'page arguments' => array(2,4,5),
 	);
-	$items['schedule/tags/%/%/roomdel/%'] = array (
-		'type' => MENU_CALLBACK,
-		'page callback' => 'conschedule_tag_room_del',
+	$items['schedule/tag/%/tagday/%/add'] = array (
+		'title' => 'Add',
+		'type' => MENU_DEFAULT_TASK,
+		'page callback' => 'conschedule_tagday',
 		'access arguments' => array('administer conschedule'),
 		'file' => 'tags.inc',
-		'page arguments' => array(2,3,5),
+		'page arguments' => array(2,4,5),
 	);
-	*/
+	$items['schedule/tag/%/tagday/%/delete'] = array (
+		'title' => 'Delete',
+		'type' => MENU_DEFAULT_TASK,
+		'page callback' => 'conschedule_tagday',
+		'access arguments' => array('administer conschedule'),
+		'file' => 'tags.inc',
+		'page arguments' => array(2,4,5),
+	);
 
 	return $items;
 }

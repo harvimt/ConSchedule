@@ -37,6 +37,14 @@ function conschedule_event($event_id,$op='view')
 //implements hook_form
 function conschedule_event_form($form_state, $event_id, $op)
 {
+	//drupal_add_js(drupal_get_path('');
+	foreach(array('endTime','startTime') as $js_id)
+	{
+		//con_dump(array($js_id=>array('timesteps'=>array(1,30,0))));
+		//$extraDrupalSettings['datePopup']["edit-$js_id-timeEntry-popup-1"]['settings']['timeSteps'] = array(1,30,0);
+		//drupal_add_js($extraDrupalSettings,'setting');
+	}
+
 	//Preconditions
 	assert(is_numeric($event_id));
 	assert(in_array($op, array('add','edit', 'delete')));
@@ -134,7 +142,6 @@ function conschedule_event_form($form_state, $event_id, $op)
 			'#title' => t('Title'),
 			'#default_value' => $data->e_eventname,
 			'#maxlength' => 255,
-			//'#description' => t('Title for this Event'),
 		),
 		'description' => array(
 			'#type' => 'textarea',
@@ -142,19 +149,18 @@ function conschedule_event_form($form_state, $event_id, $op)
 			'#default_value' => $data->e_eventdesc,
 			'#size' => 44,
 			'#maxlength' => 255,
-			//'#description' => t('Description for this Event'),
 		),
 		'startTime' => array(
 			'#type' => 'date_popup',
 			'#title' => t('Start Date'),
 			'#default_value' => $data->e_datestart,
-			//'#description' => t('Time the Event Starts'),
+			'#date_increment' => 30,
 		),
 		'endTime' => array(
 			'#type' => 'date_popup',
 			'#title' => t('End Date'),
 			'#default_value' => $data->e_dateend,
-			//'#description' => t('Time the Event Stops'),
+			'#date_increment' => 30,
 		),
 		'color' => array(
 			'#type' => 'colorpicker_textfield',
@@ -189,14 +195,39 @@ function conschedule_event_form($form_state, $event_id, $op)
 function conschedule_event_form_validate($form, &$form_state)
 {
 	if($form_state['values']['_op'] != 'delete'){
+		$startTime = date_create($form_state['values']['startTime']);
+		$endTime = date_create($form_state['values']['endTime']);
+		$startTimeArr = getdate($startDate->getTimestamp());
+		$endTimeArr = getdate($endDate->getTimestamp());
+
 		if($form_state['values']['title'] == '')
 		{
 			form_set_error('title', t('You must give an event a title'));
 		}
-		if(date_create($form_state['values']['startTime']) > date_create($form_state['values']['endTime']))
+		if( $startTime > $endTime )
 		{
 			form_set_error('endTime', t('End Date must be after Start Date'));
 		}
+
+		if($startTimeArr['seconds'] != 0)
+		{
+			form_set_error('startTime', t('Start Time must not contain seconds (how did you set them?)'));
+		}
+		if($endTimeArr['seconds'] != 0)
+		{
+			form_set_error('endTime', t('End Time must not contain seconds (how did you set them?)'));
+		}
+
+
+		if($startTimeArr['minutes'] != 0 && $startTimeArr['minutes'] != 30)
+		{
+			form_set_error('startTime', t('Start Time Must be on an interval of 30 minutes'));
+		}
+		if($endTimeArr['minutes'] != 0 && $endTimeArr['minutes'] != 30)
+		{
+			form_set_error('endTime', t('End Time Must be on an interval of 30 minutes'));
+		}
+
 	}
 	
 }
