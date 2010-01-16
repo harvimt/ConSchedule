@@ -370,6 +370,37 @@ function conschedule_tagday_form($form_state, $tag_id, $tag_day, $op)
 function conschedule_tagday_form_validate($form, &$form_state)
 {
 
+	if($form_state['values']['_op'] != 'delete'){
+		$startTime = date_create($form_state['values']['startTime']);
+		$endTime = date_create($form_state['values']['endTime']);
+		$startTimeArr = getdate($startDate->getTimestamp());
+		$endTimeArr = getdate($endDate->getTimestamp());
+
+		if( $startTime > $endTime )
+		{
+			form_set_error('endTime', t('End Date must be after Start Date'));
+		}
+
+		if($startTimeArr['seconds'] != 0)
+		{
+			form_set_error('startTime', t('Start Time must not contain seconds (how did you set them?)'));
+		}
+		if($endTimeArr['seconds'] != 0)
+		{
+			form_set_error('endTime', t('End Time must not contain seconds (how did you set them?)'));
+		}
+
+
+		if($startTimeArr['minutes'] != 0 && $startTimeArr['minutes'] != 30)
+		{
+			form_set_error('startTime', t('Start Time Must be on an interval of 30 minutes'));
+		}
+		if($endTimeArr['minutes'] != 0 && $endTimeArr['minutes'] != 30)
+		{
+			form_set_error('endTime', t('End Time Must be on an interval of 30 minutes'));
+		}
+
+	}
 }
 
 function conschedule_tagday_form_submit($form, &$form_state)
