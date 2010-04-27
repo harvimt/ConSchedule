@@ -40,7 +40,7 @@ function conschedule_room_form($form_state, $room_id, $op)
 	//Preconditions
 	if($op != 'add')
 	{
-		assert(is_int($room_id));
+		assert(con_is_int($room_id));
 	}
 	assert(in_array($op, array('add','edit', 'delete')));
 	if($op == 'edit'){

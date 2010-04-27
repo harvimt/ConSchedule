@@ -23,7 +23,8 @@
  */
 
 //implements hook_init
-function conschedule_init(){
+function conschedule_init()
+{
 	global $conschedule_global;
 
 	//SETTINGS
@@ -43,14 +44,23 @@ function conschedule_init(){
 	$conschedule_global->conTitle = 'MewCon Schedule Test';
 }
 
-function con_dump($o){
+//Helper functions
+function con_dump($o)
+{
 	echo '<pre>';
 	nl2br(var_dump($o));
 	echo '</pre>';
 }
 
+function con_is_int($s)
+{
+	//because is_int fails on strings which are integers
+	return is_numeric($s) && ($f = floatval($s)) == intval($f);
+}
+
 //implements hook_menu
-function conschedule_menu(){
+function conschedule_menu()
+{
 	$items['schedule'] = array(
 		'title' => 'Schedule',
 		'type' => MENU_NORMAL_ITEM,
@@ -274,6 +284,7 @@ function conschedule_menu(){
 }
 
 //implements hook_perm
-function conschedule_perm(){
+function conschedule_perm()
+{
 	return array('access content', 'administer conschedule');
 }

@@ -46,7 +46,7 @@ function conschedule_event_form($form_state, $event_id, $op)
 	}
 
 	//Preconditions
-	assert(is_int($event_id));
+	assert(con_is_int($event_id));
 	assert(in_array($op, array('add','edit', 'delete')));
 	if($op == 'view' || $op == 'edit')
 	{
@@ -279,7 +279,7 @@ function conschedule_event_form_submit($form, &$form_state)
 
 function conschedule_event_view($event_id){
 	global $user;
-	assert(is_int($event_id));
+	assert(con_is_int($event_id));
 	assert($event_id > 0);
 
 	$result = db_query('SELECT 

@@ -69,11 +69,7 @@ function conschedule_tag_list()
 function conschedule_tag_form($form_state, $tag_id, $op)
 {
 	assert(in_array($op, array('add','edit','delete')));
-	assert(is_int($tag_id));
-
-	//con_dump($form_state);
-	//con_dump($tag_id);
-	//con_dump($op);
+	assert(con_is_int($tag_id));
 
 	$form = array(
 		'_op' => array(
@@ -177,14 +173,47 @@ function conschedule_tag_form($form_state, $tag_id, $op)
 				'#title' => 'Rooms not attached',
 				'#options' => $rooms,
 			);
-			/*
 			$form['rooms']['addroom_btn'] = array(
 				'#type'=>'submit',
-				'#value'=>'Button',
-			)
-			*/
+				'#value'=>'Add Room',
+			);
 		}
+
 		//Tag Days
+		$rows = array();
+		$headers = array('Tag Day', 'Start Time', 'End Time', '');
+
+		$result = db_query('
+			SELECT td_tdid, td_day, td_datestart, td_dateend
+			FROM {conschedule_tagdays}
+			WHERE td_tagid = %d
+			ORDER BY td_day',
+			$tag_id);
+
+		while($row = db_fetch_object($result))
+		{
+			$rows[] = array(
+				'day' => $row->td_day + 1,
+				'datestart' => $row->td_datestart,
+				'dateend' => $row->td_dateend,
+				'actions' =>
+					'<a href="'.url('schedule/tag/'.$tag_id.'/tagday/'.$row->td_tdid.'/edit').'">Edit</a>'.
+					'<a href="'.url('schedule/tag/'.$tag_id.'/tagday/'.$row->td_tdid.'/delete').'">Delete</a>',
+			);
+		}
+
+		if(empty($rows))
+		{
+			$forms['days']['table'] = 'No Attached Days Yet';
+		}
+		else
+		{
+			$forms['days']['table'] = theme_table($headers, $rows);
+		}
+		$form['days']['adddays_btn'] = array(
+			'#type'=>'submit',
+			'#value'=>'Add Tag Day',
+		);
 	}
 
 	$form['submit'] = array('#type'=>'submit', '#value'=>'Save');
@@ -252,10 +281,10 @@ function conschedule_tag_form_submit($form,&$form_state)
 }
 
 //##TAG ROOM HANDLING
-function conschedule_tag_roomadd($tag_id, $room_id)
+function conschedule_tag_roomrem($tag_id, $room_id)
 {
-	assert(is_int($room_id));
-	assert(is_int($tag_id));
+	assert(con_is_int($room_id));
+	assert(con_is_int($tag_id));
 
 	$result = db_query('DELETE FROM {conschedule_tags_rooms} WHERE tr_tagid = %d AND tr_roomid = %d',
 		$tag_id, $room_id);
@@ -269,13 +298,13 @@ function conschedule_tag_roomadd($tag_id, $room_id)
 		drupal_set_message('Room not attached to Tag','error');
 	}
 
-	drupal_goto('schedule/tag/'.$tag_name.'/edit');
+	drupal_goto('schedule/tag/'.$tag_id.'/edit');
 }
 
-function conschedule_tag_roomrem($tag_id, $room_id)
+function conschedule_tag_roomadd($tag_id, $room_id)
 {
-	assert(is_int($room_id));
-	assert(is_int($tag_id));
+	assert(con_is_int($room_id));
+	assert(con_is_int($tag_id));
 
 	$result = db_query('SELECT tr_trid FROM {conschedule_tags_rooms} WHERE tr_tagid = %d AND tr_roomid = %d',
 		$tag_id, $room_id);
@@ -284,14 +313,14 @@ function conschedule_tag_roomrem($tag_id, $room_id)
 	{
 		db_query('INSERT INTO {conschedule_tags_rooms} (tr_tagid, tr_roomid) VALUES (%d, %d)',
 			$tag_id, $room_id);
-		drupal_set_message('Room added to Tag');
+		drupal_set_message('Room Removed from Tag');
 	}
 	else
 	{
 		drupal_set_message('Room already attached','error');
 	}
 
-	drupal_goto('schedule/tag/'.$tag_name.'/edit');
+	drupal_goto('schedule/tag/'.$tag_id.'/edit');
 }
 
 //##TAG DAY
@@ -303,9 +332,9 @@ function conschedule_tagday($tag_id = null, $tag_day = 0, $op='edit')
 function conschedule_tagday_form($form_state, $tag_id, $tag_day, $op)
 {
 	//Preconditions
-	assert(is_int($tag_id));
+	assert(con_is_int($tag_id));
 	assert($tag_id >= 0);
-	assert(is_int($tag_day));
+	assert(con_is_int($tag_day));
 	assert($tag_day >= 0);
 	assert(in_array($op, array('add','edit','delete')));
 
