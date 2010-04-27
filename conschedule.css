@@ -1,24 +1,24 @@
 /*
- *      conschedule.css
- *      
- *      Copyright © 2009, 2010 Drew Fisher <kakudevel@gmail.com>
- *      Copyright © 2010 Mark Harviston <infinull@gmail.com>
+ *		conschedule.css
+ *		
+ *		Copyright © 2009, 2010 Drew Fisher <kakudevel@gmail.com>
+ *		Copyright © 2010 Mark Harviston <infinull@gmail.com>
  *		ALL RIGHTS RESERVED
- *      
- *      This program is free software; you can redistribute it and/or modify
- *      it under the terms of the GNU General Public License as published by
- *      the Free Software Foundation; either version 2 of the License, or
- *      (at your option) any later version.
- *      
- *      This program is distributed in the hope that it will be useful,
- *      but WITHOUT ANY WARRANTY; without even the implied warranty of
- *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *      GNU General Public License for more details.
- *      
- *      You should have received a copy of the GNU General Public License
- *      along with this program; if not, write to the Free Software
- *      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- *      MA 02110-1301, USA.
+ *		
+ *		This program is free software; you can redistribute it and/or modify
+ *		it under the terms of the GNU General Public License as published by
+ *		the Free Software Foundation; either version 2 of the License, or
+ *		(at your option) any later version.
+ *		
+ *		This program is distributed in the hope that it will be useful,
+ *		but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *		GNU General Public License for more details.
+ *		
+ *		You should have received a copy of the GNU General Public License
+ *		along with this program; if not, write to the Free Software
+ *		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ *		MA 02110-1301, USA.
  */
  
 <<<<<<< HEAD:MEWschedule.css
@@ -164,14 +164,14 @@ table#conflicts thead
 .foundEvent .event
 {
 	position: absolute;
-    /*TODO: Drew choose:
+	/*TODO: Drew choose:
 	text-align: center;
 	width: 100%;
 	or:
 	*/
 	margin: .5em;
 	/* but not both, (or get fancy with dummy divs)*/
-    top: 50%;
+	top: 50%;
 }
 
 .foundEvent .endTime
