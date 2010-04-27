@@ -1,0 +1,281 @@
+<?php
+// vim: syn=php
+/*
+ *event.inc
+ *
+ *Copyright © 2010 Mark Harviston <infinull@gmail.com>
+ *		ALL RIGHTS RESERVED
+ *
+ *This program is free software; you can redistribute it and/or modify
+ *it under the terms of the GNU General Public License as published by
+ *the Free Software Foundation; either version 2 of the License, or
+ *(at your option) any later version.
+ *
+ *This program is distributed in the hope that it will be useful,
+ *but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *GNU General Public License for more details.
+ *
+ *You should have received a copy of the GNU General Public License
+ *along with this program; if not, write to the Free Software
+ *Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ *MA 02110-1301, USA.
+ */
+/**
+ * @file conschedule.install
+ * @author Mark Harviston
+ * @version 0.1
+ */
+
+/**
+ * Implementation of hook_install()
+ */
+
+function conschedule_install() {
+	drupal_install_schema('conschedule');
+}
+
+/**
+ * Implementation of hook_uninstall()
+ */
+
+function conschedule_uninstall() {
+	drupal_uninstall_schema('conschedule');
+}
+
+/**
+* Implementation of hook_schema().
+*/
+
+function conschedule_schema() {
+	//database schema
+	$schema['conschedule_events'] = array(
+		'description' => t('Schedule Events'),
+		'fields' => array(
+			'e_eventid' => array(
+				'type' => 'serial',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+				'size' => 'normal',
+				'description' => t('Auto Incrementer'),
+			),
+			'e_roomid' => array(
+				'type' => 'int',
+				'unsigned' => TRUE,
+				'size' => 'normal',
+				'not null' => TRUE,
+				'description' => t('Foreign key to a room'),
+			),
+			'e_datestart' => array(
+				'type' => 'datetime',
+				'not null' => TRUE,
+				'default' => '0000-00-00 00:00:00',
+			),
+			'e_dateend' => array(
+				'type' => 'datetime',
+				'not null' => TRUE,
+				'default' => '0000-00-00 00:00:00',
+			),
+			'e_eventname' => array(
+				'type' => 'varchar',
+				'length' => 255,
+				'not null' => TRUE,
+				'default' => '',
+			),
+			'e_color' => array(
+				'type' => 'varchar',
+				'length' => 10,
+				'not null' => TRUE,
+				'default' => '',
+			),
+			'e_eventdesc' => array(
+				'type' => 'varchar',
+				'length' => 255,
+				'not null' => TRUE,
+				'default' => '',
+			),
+			'e_panelist' => array(
+				'type' => 'varchar',
+				'length' => 40,
+				'not null' => TRUE,
+			),
+		),
+		'primary key' => array('e_eventid'),
+	);
+	
+	$schema['conschedule_userschedule'] = array(
+		'description' => 'Where a user can store events in his/her personal schedule',
+		'fields' => array(
+			'us_uschedid' => array(
+				'type' => 'serial',
+				'unsigned' => true,
+				'not null' => true,
+			),
+			'us_userid' => array(
+				'type' => 'int',
+				'size' => 'normal',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+				'default' => 0,
+			),
+			'us_eventid' => array(
+				'type' => 'int',
+				'size' => 'normal',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+				'default' => 0,
+			),
+		),
+		'primary key' => array('us_uschedid'),
+	);
+
+	$schema['conschedule_rooms'] = array(
+		'description' => 'Rooms on the conschedule',
+		'fields' => array(
+			'r_roomid' => array(
+				'type' => 'serial',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+			),
+			'r_roomname' => array(
+				'type' => 'varchar',
+				'length' => 40,
+				'not null' => TRUE,
+			),
+		),
+		'primary key' =>  array('r_roomid'),
+	); 
+
+	//Convention Tags, (new in 0.2)
+	$schema['conschedule_tags'] = array(
+		'description' => '',
+		'fields' => array(
+			't_tagid' => array(
+				'type' => 'serial',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+			),
+			't_tagname' => array(
+				'type' => 'varchar',
+				'length' => 40,
+				'not null' => TRUE,
+			),
+		),
+		'primary key' =>  array('t_tagid'),
+	); 
+
+	$schema['conschedule_tag_days'] = array(
+		'description' => '',
+		'fields' => array(
+			'td_tagdayid' => array(
+				'type' => 'serial',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+			),
+			'td_tagid' => array(
+				'type' => 'int',
+				'unsigned' => TRUE,
+				'no null' => TRUE,
+			),
+			'td_daynum' => array(
+				'type' => 'int',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+			),
+			'td_datestart' => array(
+				'type' => 'datetime',
+				'not null' => TRUE,
+				'default' => '0000-00-00 00:00:00',
+			),
+			'td_dateend' => array(
+				'type' => 'datetime',
+				'not null' => TRUE,
+				'default' => '0000-00-00 00:00:00',
+			),
+		),
+		'primary key' => array('td_tagdayid'),
+	);
+
+	$schema['conschedule_tags_rooms'] = array(
+		'description' => 'Rooms on the conschedule',
+		'fields' => array(
+			'tr_trid' => array(
+				'type' => 'serial',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+			),
+			'tr_tagid' => array(
+				'type' => 'int',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+			),
+			'tr_roomid' => array(
+				'type' => 'int',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+			),
+		),
+		'primary key' => array('tr_trid'),
+	);
+
+	return $schema;
+}
+
+function conschedule_update_6001(&$sandbox)
+{
+	$schema = array();
+	$schema['conschedule_tags'] = array(
+		'description' => 'Convention Tags',
+		'fields' => array(
+			't_tagname' => array(
+				'type' => 'varchar',
+				'length' => 40,
+				'not null' => TRUE,
+			),
+			't_day' => array(
+				'type' => 'int',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+			),
+			't_datestart' => array(
+				'type' => 'datetime',
+				'not null' => TRUE,
+				'default' => '0000-00-00 00:00:00',
+			),
+			't_dateend' => array(
+				'type' => 'datetime',
+				'not null' => TRUE,
+				'default' => '0000-00-00 00:00:00',
+			),
+		),
+		'primary key' =>  array('t_tagname', 't_day'),
+	); 
+
+	$schema['conschedule_tags_rooms'] = array(
+		'description' => 'Map Rooms to Tags',
+		'fields' => array(
+			'tr_trid' => array(
+				'type' => 'serial',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+			),
+			'tr_tagid' => array(
+				'type' => 'int',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+			),
+			'tr_roomid' => array(
+				'type' => 'int',
+				'unsigned' => TRUE,
+				'not null' => TRUE,
+			),
+		),
+		'primary key' =>  array('r_roomid'),
+	);
+}
+
+function conschedule_update_6002(&$sandbox)
+{
+	db_query('ALTER TABLE {conschedule_tag_rooms} DROP COLUMN tr_tagid');
+	db_query('ALTER TABLE {conschedule_tag_rooms} ADD COLUMN tr_tagname varchar(40) NOT NULL AFTER tr_trid');
+}

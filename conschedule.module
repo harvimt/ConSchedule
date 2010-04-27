@@ -1,0 +1,290 @@
+<?php
+// vim: syn=php
+/*
+ *		conschedule.module
+ *		
+ *		Copyright © 2010 Mark Harviston <infinull@gmail.com>
+ *		ALL RIGHTS RESERVED
+ *		
+ *		This program is free software; you can redistribute it and/or modify
+ *		it under the terms of the GNU General Public License as published by
+ *		the Free Software Foundation; either version 2 of the License, or
+ *		(at your option) any later version.
+ *		
+ *		This program is distributed in the hope that it will be useful,
+ *		but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *		GNU General Public License for more details.
+ *		
+ *		You should have received a copy of the GNU General Public License
+ *		along with this program; if not, write to the Free Software
+ *		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ *		MA 02110-1301, USA.
+ */
+
+//implements hook_init
+function conschedule_init()
+{
+	global $conschedule_global;
+
+	//SETTINGS
+	date_default_timezone_set('America/Los_Angeles');
+
+	$conschedule_global = new stdClass();
+	$conschedule_global->defaultStartTime = "08:00:00";
+	$conschedule_global->defaultEndTime = "03:00:00";
+	$conschedule_global->conTimes[0]['start'] = "2009-12-30 20:00:00";
+	$conschedule_global->conTimes[0]['end'] = "2009-12-31 00:00:00";
+	$conschedule_global->conTimes[1]['start'] = "2009-12-31 09:00:00";
+	$conschedule_global->conTimes[1]['end'] = "2010-01-01 03:00:00";
+	$conschedule_global->conTimes[2]['start'] = "2010-01-01 09:00:00";
+	$conschedule_global->conTimes[2]['end'] = "2010-01-02 02:00:00";
+	$conschedule_global->conTimes[3]['start'] = "2010-01-02 09:00:00";
+	$conschedule_global->conTimes[3]['end'] = "2010-01-03 00:00:00";
+	$conschedule_global->conTitle = 'MewCon Schedule Test';
+}
+
+//Helper functions
+function con_dump($o)
+{
+	echo '<pre>';
+	nl2br(var_dump($o));
+	echo '</pre>';
+}
+
+function con_is_int($s)
+{
+	//because is_int fails on strings which are integers
+	return is_numeric($s) && ($f = floatval($s)) == intval($f);
+}
+
+//implements hook_menu
+function conschedule_menu()
+{
+	$items['schedule'] = array(
+		'title' => 'Schedule',
+		'type' => MENU_NORMAL_ITEM,
+		'menu_name' => 'primary-links', //show in menu
+		'page callback' => 'conschedule_home',
+		'access arguments' => array('access content'),
+		'file' => 'conschedule.inc',
+	);
+	$items['schedule/kiosk'] = array(
+		'title' => 'Schedule Kiosk',
+		'type' => MENU_CALLBACK,
+		'page callback' => 'conschedule_kiosk',
+		'access arguments' => array('access content'),
+		'file' => 'conschedule.inc',
+	);
+
+	//Event (add, edit, delete, and even view)
+	$items['schedule/event/%'] = array(
+		'title' => 'Event',
+		'page arguments' => array(2),
+		'page callback' => 'conschedule_event',
+		'access arguments' => array('access content'),
+		'file' => 'event.inc',
+	);
+	$items['schedule/event/%/view'] = array(
+		'title' => 'View',
+		'type' => MENU_DEFAULT_LOCAL_TASK,
+		'page arguments' => array(2,3),
+		'page callback' => 'conschedule_event',
+		'access arguments' => array('access content'),
+		'file' => 'event.inc',
+	);
+	$items['schedule/event/%/edit'] = array(
+		'title' => 'Edit',
+		'type' => MENU_LOCAL_TASK,
+		'page callback' => 'conschedule_event',
+		'page arguments' => array(2,3),
+		'access arguments' => array('administer conschedule'),
+		'file' => 'event.inc',
+	);
+	$items['schedule/event/%/add'] = array(
+		'title' => 'Add',
+		'type' => MENU_LOCAL_TASK,
+		'page callback' => 'conschedule_event',
+		'page arguments' => array(2,3),
+		'access arguments' => array('administer conschedule'),
+		'file' => 'event.inc',
+	);
+	$items['schedule/event/%/delete'] = array(
+		'title' => 'Delete',
+		'type' => MENU_LOCAL_TASK,
+		'page callback' => 'conschedule_event',
+		'page arguments' => array(2,3),
+		'access arguments' => array('administer conschedule'),
+		'file' => 'event.inc',
+	);
+
+	//Room (add, edit, delete, and list)
+	$items['schedule/room'] = array(
+		'title' => 'Room',
+		'page callback' => 'conschedule_room',
+		'type' => MENU_NORMAL_ITEM,
+		'menu_name' => 'primary-links', //show in menu
+		'access arguments' => array('administer conschedule'),
+		'file' => 'room.inc',
+	);
+	$items['schedule/room/%/list'] = array(
+		'title' => 'List',
+		'type' => MENU_DEFAULT_LOCAL_TASK,
+		'page arguments' => array(2,3),
+		'page callback' => 'conschedule_room',
+		'access arguments' => array('administer conschedule'),
+		'file' => 'room.inc',
+	);
+	$items['schedule/room/%/edit'] = array(
+		'title' => 'Edit',
+		'type' => MENU_LOCAL_TASK,
+		'page callback' => 'conschedule_room',
+		'page arguments' => array(2,3),
+		'access arguments' => array('administer conschedule'),
+		'file' => 'room.inc',
+	);
+	$items['schedule/room/%/add'] = array(
+		'title' => 'Add',
+		'type' => MENU_LOCAL_TASK,
+		'page callback' => 'conschedule_room',
+		'page arguments' => array(2,3),
+		'access arguments' => array('administer conschedule'),
+		'file' => 'room.inc',
+	);
+	$items['schedule/room/%/delete'] = array(
+		'title' => 'Delete',
+		'type' => MENU_LOCAL_TASK,
+		'page callback' => 'conschedule_room',
+		'page arguments' => array(2,3),
+		'access arguments' => array('administer conschedule'),
+		'file' => 'room.inc',
+	);
+
+	//User Schedule
+	$items['schedule/userschedule'] = array (
+		'title' => 'User Schedule',
+		'type' => MENU_NORMAL_ITEM,
+		'menu_name' => 'primary-links', //show in menu
+		'page callback' => 'conschedule_usersched',
+		'access arguments' => array('authenticated user'),
+		'file' => 'userschedule.inc',
+	);
+	$items['schedule/userschedule/addevent/%'] = array (
+		'type' => MENU_CALLBACK,
+		'page callback' => 'conschedule_usersched_add_event',
+		'access arguments' => array('authenticated user'),
+		'file' => 'userschedule.inc',
+		'page arguments' => array(3),
+	);
+	$items['schedule/userschedule/delevent/%'] = array (
+		'type' => MENU_CALLBACK,
+		'page callback' => 'conschedule_usersched_del_event',
+		'access arguments' => array('authenticated user'),
+		'file' => 'userschedule.inc',
+		'page arguments' => array(3),
+	);
+
+	//Tags, in Dylan's words, "This is a complex piece of machinery, that's why I've avoided doing it for so long"
+	//He's not wrong, see tags.inc for more info!
+
+
+	//Tag
+	$items['schedule/tag'] = array (
+		'title' => 'Tag',
+		'type' => MENU_NORMAL_ITEM,
+		'menu_name' => 'primary-links', //show in menu
+		'page callback' => 'conschedule_tag',
+		'access arguments' => array('administer conschedule'),
+		'file' => 'tags.inc',
+	);
+	$items['schedule/tag/%/list'] = array (
+		'title' => 'List',
+		'type' => MENU_DEFAULT_LOCAL_TASK,
+		'page callback' => 'conschedule_tag',
+		'access arguments' => array('administer conschedule'),
+		'file' => 'tags.inc',
+		'page arguments' => array(2,3),
+	);
+	$items['schedule/tag/%/add'] = array (
+		'title' => 'Add',
+		'type' => MENU_LOCAL_TASK,
+		'page callback' => 'conschedule_tag',
+		'access arguments' => array('administer conschedule'),
+		'file' => 'tags.inc',
+		'page arguments' => array(2,3),
+	);
+	$items['schedule/tag/%/delete'] = array (
+		'title' => 'Delete',
+		'type' => MENU_LOCAL_TASK,
+		'page callback' => 'conschedule_tag',
+		'access arguments' => array('administer conschedule'),
+		'file' => 'tags.inc',
+		'page arguments' => array(2,3),
+	);
+	$items['schedule/tag/%/edit'] = array (
+		'title' => 'Edit',
+		'type' => MENU_LOCAL_TASK,
+		'page callback' => 'conschedule_tag',
+		'access arguments' => array('administer conschedule'),
+		'file' => 'tags.inc',
+		'page arguments' => array(2,3),
+	);
+
+	$items['schedule/tag/%/roomadd/%'] = array (
+		'type' => MENU_CALLBACK,
+		'page callback' => 'conschedule_tag_roomadd',
+		'access arguments' => array('administer conschedule'),
+		'file' => 'tags.inc',
+		'page arguments' => array(2,4),
+	);
+	$items['schedule/tag/%/roomrem/%'] = array (
+		'title' => 'Edit',
+		'type' => MENU_CALLBACK,
+		'page callback' => 'conschedule_tag_roomrem',
+		'access arguments' => array('administer conschedule'),
+		'file' => 'tags.inc',
+		'page arguments' => array(2,4),
+	);
+
+	//Tag Day
+	$items['schedule/tag/%/tagday/%'] = array (
+		'title' => 'Tag Day',
+		'type' => MENU_NORMAL_ITEM,
+		'page callback' => 'conschedule_tagday',
+		'access arguments' => array('administer conschedule'),
+		'file' => 'tags.inc',
+		'page arguments' => array(2,4),
+	);
+	$items['schedule/tag/%/tagday/%/edit'] = array (
+		'title' => 'Edit',
+		'type' => MENU_DEFAULT_LOCAL_TASK,
+		'page callback' => 'conschedule_tagday',
+		'access arguments' => array('administer conschedule'),
+		'file' => 'tags.inc',
+		'page arguments' => array(2,4,5),
+	);
+	$items['schedule/tag/%/tagday/%/add'] = array (
+		'title' => 'Add',
+		'type' => MENU_DEFAULT_TASK,
+		'page callback' => 'conschedule_tagday',
+		'access arguments' => array('administer conschedule'),
+		'file' => 'tags.inc',
+		'page arguments' => array(2,4,5),
+	);
+	$items['schedule/tag/%/tagday/%/delete'] = array (
+		'title' => 'Delete',
+		'type' => MENU_DEFAULT_TASK,
+		'page callback' => 'conschedule_tagday',
+		'access arguments' => array('administer conschedule'),
+		'file' => 'tags.inc',
+		'page arguments' => array(2,4,5),
+	);
+
+	return $items;
+}
+
+//implements hook_perm
+function conschedule_perm()
+{
+	return array('access content', 'administer conschedule');
+}

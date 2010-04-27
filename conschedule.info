@@ -1,0 +1,5 @@
+; $Id$
+name = "ConSchedule"
+description = "A tabular layout for a events showing different events at a convention"
+package = Other
+core = 6.x

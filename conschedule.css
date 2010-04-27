@@ -1,7 +1,8 @@
 /*
- *      MEWSchedule.css
+ *      conschedule.css
  *      
  *      Copyright © 2009, 2010 Drew Fisher <kakudevel@gmail.com>
+ *      Copyright © 2010 Mark Harviston <infinull@gmail.com>
  *		ALL RIGHTS RESERVED
  *      
  *      This program is free software; you can redistribute it and/or modify
@@ -20,19 +21,22 @@
  *      MA 02110-1301, USA.
  */
  
+<<<<<<< HEAD:MEWschedule.css
 body
 {
 	background-color: #FFF;
 	/*margin-top: 3em;*/
+=======
+#conschedule_body{
+>>>>>>> Mark_Drupal_Integration:conschedule.css
 	margin-left: 8px;
 	margin-right: 8px;
 }
 
 table
 {
-	border: 1px solid black;
-	border-right: 0;
-	border-bottom: 0;
+	border-collapse: collapse;
+	width: 100%;
 }
 
 table thead
@@ -48,12 +52,41 @@ table thead
 	background-color: #fff;
 }
 
+<<<<<<< HEAD:MEWschedule.css
 table td, table th
 {
 	width: 13%;
 	border-bottom: 1px solid black;
 	border-right: 1px solid black;
 	padding: .25em;
+=======
+table td, table th {
+	border: 1px solid black; 
+	border-width: 1px; padding: .25em;
+	top: 0px;
+	left: 8px;
+	background-color: #fff;
+	width: 13%;
+}
+
+table th{
+	font-weight: bold;
+	text-align: center;
+}
+
+caption, caption h2
+{
+	border-top: 1px double #000;
+	border-bottom: 1px double #000;
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+
+caption h2
+{
+	padding-top: 8px;
+	padding-bottom: 8px;
+>>>>>>> Mark_Drupal_Integration:conschedule.css
 }
 
 table.timeForm{
@@ -63,8 +96,11 @@ table.timeForm{
 table.timeForm thead
 {
 	font-weight: normal;
+	font-size: small;
+	color: #707070;
 	text-align: left;
 }
+
 
 table.timeForm td
 {
@@ -87,14 +123,30 @@ table#conflicts thead
 .timeColumn 
 {
 	font-weight: bold;
+<<<<<<< HEAD:MEWschedule.css
 	text-align: center;
 	height: 2em;
 	width: 4%;
+=======
+	width: 4%;
+	text-align: center;
+	height: 3em;
+}
+
+/* In User Schedule */
+.inusched .event_container
+{
+	border: 1px solid red;
+>>>>>>> Mark_Drupal_Integration:conschedule.css
 }
 
 .foundEvent
 {
 	padding: 0em;
+}
+
+.event_container {
+	position: relative;
 }
 
 .foundEvent .startTime
@@ -105,11 +157,21 @@ table#conflicts thead
 	text-align: center;
 	border-bottom: 1px dashed black;
 	width: 100%;
+	position: absolute;
+	top: 0px;
 }
 
 .foundEvent .event
 {
+	position: absolute;
+    /*TODO: Drew choose:
+	text-align: center;
+	width: 100%;
+	or:
+	*/
 	margin: .5em;
+	/* but not both, (or get fancy with dummy divs)*/
+    top: 50%;
 }
 
 .foundEvent .endTime
@@ -120,6 +182,8 @@ table#conflicts thead
 	text-align: center;
 	border-top: 1px dashed black;
 	width: 100%;
+	position: absolute;
+	bottom: 0px;
 }
 
 /* HEADER MENU SECTION */
