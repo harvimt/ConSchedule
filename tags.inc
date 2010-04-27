@@ -183,10 +183,10 @@ function conschedule_tag_form($form_state, $tag_id, $op)
 		$headers = array('Tag Day', 'Start Time', 'End Time', '');
 
 		$result = db_query('
-			SELECT td_tdid, td_day, td_datestart, td_dateend
-			FROM {conschedule_tagdays}
+			SELECT td_tagdayid, td_daynum, td_datestart, td_dateend
+			FROM {conschedule_tag_days}
 			WHERE td_tagid = %d
-			ORDER BY td_day',
+			ORDER BY td_daynum',
 			$tag_id);
 
 		while($row = db_fetch_object($result))
